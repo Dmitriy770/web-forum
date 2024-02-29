@@ -4,5 +4,5 @@
 public enum UserPermissions
 {
     CanPublish = 0,
-    CanHidePosts = 1
+    CanHideAnyPosts = 1
 }
