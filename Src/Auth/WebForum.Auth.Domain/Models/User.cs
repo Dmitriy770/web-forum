@@ -4,15 +4,15 @@ public sealed class User
 {
     public Guid Id { get; }
     public string Login { get; }
-    public string HashPassword { get; }
+    public string HashedPassword { get; }
     
     public UserPermissions Permissions { get; }
 
-    private User(Guid id, string login, string hashPassword, UserPermissions permissions)
+    private User(Guid id, string login, string hashedPassword, UserPermissions permissions)
     {
         Id = id;
         Login = login;
-        HashPassword = hashPassword;
+        HashedPassword = hashedPassword;
         Permissions = permissions;
     }
 
