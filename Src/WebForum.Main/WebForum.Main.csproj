@@ -8,12 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Auth\WebForum.Auth.Api\WebForum.Auth.Api.csproj" />
+      <ProjectReference Include="..\Frontend\WebForum.Fronted\WebForum.Fronted.csproj" />
     </ItemGroup>
 
 </Project>
