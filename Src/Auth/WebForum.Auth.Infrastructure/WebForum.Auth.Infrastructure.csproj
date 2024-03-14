@@ -11,4 +11,10 @@
       <ProjectReference Include="..\WebForum.Auth.Application\WebForum.Auth.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
+    </ItemGroup>
+
 </Project>

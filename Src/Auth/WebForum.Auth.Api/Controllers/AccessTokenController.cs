@@ -1,15 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using WebForum.Auth.Api.Requests;
+using WebForum.Auth.Api.Responses;
+using WebForum.Auth.Application.Queries;
 
 namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
 [Route("access-token")]
-public class AccessTokenController : ControllerBase
+public class AccessTokenController(
+    ISender sender
+) : ControllerBase
 {
-
     [HttpGet]
-    public IActionResult Get()
+    public async Task<IActionResult> Get(GetAccessTokenRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var token = await sender.Send(
+            new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
+        );
+
+        return Ok(new GetAccessTokenResponse());
     }
 }

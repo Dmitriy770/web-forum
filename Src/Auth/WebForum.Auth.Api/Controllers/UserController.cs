@@ -1,24 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using WebForum.Auth.Api.Requests;
+using WebForum.Auth.Api.Responses;
+using WebForum.Auth.Application.Commands;
 
 namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
 [Route("user")]
-public sealed class UserController : ControllerBase
+public sealed class UserController(
+    ISender sender
+) : ControllerBase
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CreateUserRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var userId = await sender.Send(new CreateUserCommand(request.Login, request.Password), cancellationToken);
+
+        return Ok(new CreateUserResponse(userId));
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut]
     public IActionResult Update()
     {
         throw new NotImplementedException();
     }
-    
-    [HttpDelete("{id:guid}")]
+
+    [HttpDelete]
     public IActionResult Delete(Guid id)
     {
         throw new NotImplementedException();

@@ -9,4 +9,6 @@ public interface IUserRepository
     public Task Delete(Guid id, CancellationToken cancellationToken);
 
     public Task<User?> FindByUserId(Guid id, CancellationToken cancellationToken);
+
+    public Task<User?> FindByLogin(string login, CancellationToken cancellationToken);
 }
