@@ -17,7 +17,11 @@ public sealed class JwtProvider(
 
     public string GenerateToken(User user)
     {
-        var claims = new Claim[]{new("UserId", user.Id.ToString())};
+        var claims = new Claim[]
+        {
+            new("UserId", user.Id.ToString()),
+            new(nameof(user.Permissions), user.Permissions.ToString())
+        };
         
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),

@@ -1,13 +1,14 @@
 ﻿using WebForum.Auth.Application.Interfaces;
 using WebForum.Auth.Application.Queries;
 using WebForum.Auth.Infrastructure.Options;
+using WebForum.Auth.Infrastructure.Repositories;
 using WebForum.Auth.Infrastructure.Utilities;
 
 namespace WebForum.Auth.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddWebForumAuth(this IServiceCollection services)
+    public static IServiceCollection AddWebForumAuth(this IServiceCollection services, IConfigurationRoot config)
     {
         // Api
         services.AddControllers();
@@ -16,9 +17,10 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAccessTokenQuery).Assembly));
         
         // Infrastructure
-        services.AddOptions<JwtOptions>(nameof(JwtOptions));
+        services.Configure<JwtOptions>(config.GetSection(nameof(JwtOptions)));
         services.AddScoped<IHasher, Hasher>();
         services.AddScoped<IJwtProvider, JwtProvider>();
+        services.AddSingleton<IUserRepository, FakeUserRepository>();
         
         return services;
     }
