@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Auth\WebForum.Auth.Api\WebForum.Auth.Api.csproj" />
-      <ProjectReference Include="..\Frontend\WebForum.Fronted\WebForum.Fronted.csproj" />
     </ItemGroup>
 
 </Project>
