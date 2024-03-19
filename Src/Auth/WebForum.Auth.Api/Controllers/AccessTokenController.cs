@@ -13,12 +13,16 @@ public class AccessTokenController(
 ) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Get(GetAccessTokenRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get(
+        GetAccessTokenRequest request,
+        CancellationToken cancellationToken)
     {
         var token = await sender.Send(
             new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
         );
+        
+        HttpContext.Response.Cookies.Append("some-cookies", token);
 
-        return Ok(token);
+        return Ok();
     }
 }

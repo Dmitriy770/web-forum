@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.CookiePolicy;
 using WebForum.Auth.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,16 +15,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseWebAssemblyDebugging();
 }
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    MinimumSameSitePolicy = SameSiteMode.Strict,
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.Always
-});
-
+app.UseWebForumAuth();
 app.MapControllers();
 app.UseHttpsRedirection();
 

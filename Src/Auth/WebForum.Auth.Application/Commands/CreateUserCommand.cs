@@ -25,7 +25,7 @@ internal sealed class CreateUserCommandHandler(
         var userId = Guid.NewGuid();
         var hashedPassword = hasher.Hash(request.Password);
 
-        var user = User.Create(userId, request.Login, hashedPassword, UserPermissions.CanPublish);
+        var user = User.Create(userId, request.Login, hashedPassword, UserPermissions.CanPublish | UserPermissions.CanHideAnyPosts);
         await userRepository.Save(user, cancellationToken);
 
         return userId;

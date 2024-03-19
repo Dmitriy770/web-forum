@@ -3,7 +3,7 @@
 [Flags]
 public enum UserPermissions
 {
-    CanPublish = 0,
-    CanHideOwnPosts = 1,
-    CanHideAnyPosts = 2
+    CanPublish = 1,
+    CanHideOwnPosts = 2,
+    CanHideAnyPosts = 4
 }

@@ -1,8 +1,12 @@
-﻿using MediatR;
+﻿using System.Runtime.CompilerServices;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
 using WebForum.Auth.Application.Commands;
+using WebForum.Auth.Domain.Models;
 
 namespace WebForum.Auth.Api.Controllers;
 
