@@ -1,76 +1,92 @@
 ﻿@page "/login"
+@using WebForum.Frontend.Services.Interfaces
 
-@using System.ComponentModel.DataAnnotations
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-<DataAnnotationsValidator/>
-<MudGrid>
-    <MudItem xs="12" sm="7">
-        <MudCard>
-            <MudCardContent>
-                <MudTextField Label="First name" HelperText="Max. 8 characters"
-                              @bind-Value="model.Username" For="@(() => model.Username)"/>
-                <MudTextField Label="Email" Class="mt-3"
-                              @bind-Value="model.Email" For="@(() => model.Email)"/>
-                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                              @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
-                <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"
-                              @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password"/>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-    <MudItem xs="12" sm="5">
-        <MudPaper Class="pa-4 mud-height-full">
-            <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
-            @if (success)
+<EditForm Model="@loginForm"
+          OnValidSubmit="OnSubmit"
+          class="mx-auto d-flex flex-column justify-center"
+          style="height: 80%; width: 400px;">
+    <DataAnnotationsValidator/>
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Login"
+                          Error="isFormError"
+                          @onfocus="OnFocus"
+                          Variant="Variant.Outlined"
+                          @bind-Value="loginForm.Login"
+                          Class="pb-4"/>
+            <MudTextField Label="Password"
+                          Error="isFormError"
+                          @onfocus="OnFocus"
+                          Variant="Variant.Outlined"
+                          @bind-Value="loginForm.Password"
+                          InputType="InputType.Password"
+                          Class="pb-4"/>
+            @if (isFormError)
             {
-                <MudText Color="Color.Success">Success</MudText>
-            }
-            else
-            {
-                <MudText Color="@Color.Error">
-                    <ValidationSummary />
+                <MudText Color="Color.Error">
+                    Wrong login or password
                 </MudText>
             }
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="12">
-        <MudText Typo="Typo.body2" Align="Align.Center">
-            Fill out the form correctly to see the success message.
-        </MudText>
-    </MudItem>
-</MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Size="Size.Large"
+                       Color="Color.Primary"
+                       Disabled="isLoading"
+                       Class="mx-auto">
+                @if (isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>Login</MudText>
+                }
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
 </EditForm>
+
 @code {
-    RegisterAccountForm model = new RegisterAccountForm();
-    bool success;
+    private readonly LoginForm loginForm = new LoginForm();
+    private bool isFormError = false;
+    private bool isLoading = false;
 
-    public class RegisterAccountForm
+    private class LoginForm
     {
-        [Required]
-        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
-        public string Username { get; set; }
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
-
-        [Required]
-        [Compare(nameof(Password))]
-        public string Password2 { get; set; }
-
+        public string? Login { get; set; }
+        public string? Password { get; set; }
     }
 
-    private void OnValidSubmit(EditContext context)
+    private void OnFocus()
     {
-        success = true;
+        isFormError = false;
+    }
+
+    private async void OnSubmit()
+    {
+        if (loginForm.Login is null || loginForm.Password is null)
+        {
+            isFormError = true;
+            return;
+        }
+
+        try
+        {
+            isLoading = true;
+            await AuthService.Login(loginForm.Login, loginForm.Password);
+            Navigation.NavigateTo("");
+        }
+        catch (Exception)
+        {
+            isLoading = false;
+            isFormError = true;
+        }
         StateHasChanged();
     }
 

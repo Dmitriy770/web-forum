@@ -7,22 +7,22 @@ using WebForum.Auth.Application.Queries;
 namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
-[Route("access-token")]
-public class AccessTokenController(
+[Route("api/auth")]
+public class Auth(
     ISender sender
 ) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("access-token")]
     public async Task<IActionResult> Get(
         GetAccessTokenRequest request,
         CancellationToken cancellationToken)
     {
-        var token = await sender.Send(
+        var (token, expiresIn) = await sender.Send(
             new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
         );
         
         HttpContext.Response.Cookies.Append("some-cookies", token);
 
-        return Ok();
+        return Ok(new GetAccessTokenResponse(expiresIn));
     }
 }

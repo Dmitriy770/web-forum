@@ -16,6 +16,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddWebForumAuth(this IServiceCollection services, IConfigurationRoot config)
     {
+        //Configuration
+        services.Configure<JwtOptions>(config.GetSection(nameof(JwtOptions)));
+        
         // Api
         services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
@@ -26,7 +29,6 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAccessTokenQuery).Assembly));
 
         // Infrastructure
-        services.Configure<JwtOptions>(config.GetSection(nameof(JwtOptions)));
         services.AddScoped<IHasher, Hasher>();
         services.AddScoped<IJwtProvider, JwtProvider>();
         services.AddSingleton<IUserRepository, FakeUserRepository>();
@@ -37,7 +39,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddApiAuthentication(this IServiceCollection services)
     {
         var jwtOptions = services.BuildServiceProvider().GetService<IOptions<JwtOptions>>()!.Value;
-        
+        Console.WriteLine(jwtOptions);
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {

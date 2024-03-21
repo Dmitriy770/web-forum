@@ -15,7 +15,7 @@ public sealed class JwtProvider(
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
-    public string GenerateToken(User user)
+    public (string token, DateTime expiresIn) GenerateToken(User user)
     {
         var claims = new Claim[]
         {
@@ -28,12 +28,14 @@ public sealed class JwtProvider(
             SecurityAlgorithms.HmacSha256
         );
 
+        var expires = DateTime.Now.AddHours(_jwtOptions.ExpiresHours);
         var token = new JwtSecurityToken(
             claims: claims,
             signingCredentials: signingCredentials,
-            expires: DateTime.Now.AddHours(_jwtOptions.ExpiresHours)
+            expires: expires
         );
+        var strToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return (strToken, expires);
     }
 }
