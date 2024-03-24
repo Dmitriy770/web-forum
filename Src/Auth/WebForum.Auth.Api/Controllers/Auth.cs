@@ -25,4 +25,11 @@ public class Auth(
 
         return Ok(new GetAccessTokenResponse(expiresIn));
     }
+
+    [HttpDelete("access-token")]
+    public IActionResult Delete()
+    {
+        HttpContext.Response.Cookies.Delete("some-coolies");
+        return Ok();
+    }
 }

@@ -79,7 +79,7 @@
         try
         {
             isLoading = true;
-            await AuthService.Login(loginForm.Login, loginForm.Password);
+            await AuthService.LogIn(loginForm.Login, loginForm.Password, CancellationToken.None);
             Navigation.NavigateTo("");
         }
         catch (Exception)

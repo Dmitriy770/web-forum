@@ -10,24 +10,33 @@ public class AuthService(
     IAuthRepository authRepository
 ) : IAuthService
 {
-    public async Task Login(string login, string password)
+    public async Task LogIn(string login, string password, CancellationToken cancellationToken)
     {
         var response = await httpClient.PostAsJsonAsync(
             "/api/auth/access-token",
-            new { login, password });
+            new { login, password },
+            cancellationToken);
 
-        var accessToken = await response.Content.ReadFromJsonAsync<AccessToken>();
+        var accessToken = await response.Content.ReadFromJsonAsync<AccessToken>(cancellationToken);
         if (accessToken is null)
         {
             throw new Exception();
         }
 
-        await authRepository.SaveAccessToken(accessToken);
+        await authRepository.SaveAccessToken(accessToken, cancellationToken);
     }
 
-    public async Task<bool> IsLogin()
+    public async Task LogOut(CancellationToken cancellationToken)
     {
-        var token = await authRepository.GetAccessToken();
+        await httpClient.DeleteAsync(
+            "api/auth/access-token",
+            cancellationToken);
+        await authRepository.DeleteAccessToken(cancellationToken);
+    }
+
+    public async Task<bool> IsLogin(CancellationToken cancellationToken)
+    {
+        var token = await authRepository.GetAccessToken(cancellationToken);
         if (token is null)
         {
             return false;

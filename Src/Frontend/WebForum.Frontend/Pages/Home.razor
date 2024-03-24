@@ -1,7 +1,23 @@
 ﻿@page "/"
+@using WebForum.Frontend.Services.Interfaces
+
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<MudButton @onclick="LogOut">Log out</MudButton>
+
+@code
+{
+    private void LogOut()
+    {
+        AuthService.LogOut(CancellationToken.None);
+        Navigation.NavigateTo("/login");
+    }
+}

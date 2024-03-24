@@ -2,7 +2,9 @@
 
 public interface IAuthService
 {
-    public Task Login(string login, string password);
+    public Task LogIn(string login, string password, CancellationToken cancellationToken);
+
+    public Task LogOut(CancellationToken cancellationToken);
     
-    public Task<bool> IsLogin();
+    public Task<bool> IsLogin(CancellationToken cancellationToken);
 }

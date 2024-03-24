@@ -22,7 +22,7 @@
     private async Task OnNavigateAsync(NavigationContext context)
     {
         if (!(context.Path.StartsWith("login") || context.Path.StartsWith("registration"))
-            && !await AuthService.IsLogin())
+            && !await AuthService.IsLogin(context.CancellationToken))
         {
             Navigation.NavigateTo("login");
         }
