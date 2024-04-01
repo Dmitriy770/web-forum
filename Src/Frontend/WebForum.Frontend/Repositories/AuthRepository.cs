@@ -10,14 +10,14 @@ public class AuthRepository(
 {
     private const string AccessTokenKey = "accessToken";
     
-    public async Task SaveAccessToken(AccessToken token, CancellationToken cancellationToken)
+    public async Task SaveAccessToken(AuthInfo token, CancellationToken cancellationToken)
     {
         await localStorage.SetItemAsync(AccessTokenKey, token, cancellationToken);
     }
 
-    public async Task<AccessToken?> GetAccessToken(CancellationToken cancellationToken)
+    public async Task<AuthInfo?> GetAccessToken(CancellationToken cancellationToken)
     {
-        return await localStorage.GetItemAsync<AccessToken>(AccessTokenKey, cancellationToken);
+        return await localStorage.GetItemAsync<AuthInfo>(AccessTokenKey, cancellationToken);
     }
 
     public async Task DeleteAccessToken(CancellationToken cancellationToken)

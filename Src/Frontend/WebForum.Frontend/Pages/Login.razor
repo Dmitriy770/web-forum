@@ -1,8 +1,13 @@
 ﻿@page "/login"
-@using WebForum.Frontend.Services.Interfaces
+@using Fluxor
+@using WebForum.Frontend.States.AuthState
+@using WebForum.Frontend.States.AuthState.Actions
 
-@inject IAuthService AuthService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
 @inject NavigationManager Navigation
+@inject IState<AuthState> AuthState
+@inject IDispatcher Dispatcher
 
 <EditForm Model="@loginForm"
           OnValidSubmit="OnSubmit"
@@ -36,9 +41,9 @@
                        Variant="Variant.Filled"
                        Size="Size.Large"
                        Color="Color.Primary"
-                       Disabled="isLoading"
+                       Disabled="AuthState.Value.Status == AuthStatus.Loading"
                        Class="mx-auto">
-                @if (isLoading)
+                @if (AuthState.Value.Status == AuthStatus.Loading)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
                     <MudText Class="ms-2">Processing</MudText>
@@ -55,7 +60,6 @@
 @code {
     private readonly LoginForm loginForm = new LoginForm();
     private bool isFormError = false;
-    private bool isLoading = false;
 
     private class LoginForm
     {
@@ -68,7 +72,7 @@
         isFormError = false;
     }
 
-    private async void OnSubmit()
+    private void OnSubmit()
     {
         if (loginForm.Login is null || loginForm.Password is null)
         {
@@ -78,15 +82,13 @@
 
         try
         {
-            isLoading = true;
-            await AuthService.LogIn(loginForm.Login, loginForm.Password, CancellationToken.None);
-            Navigation.NavigateTo("");
+            Dispatcher.Dispatch(new AuthLoginStartAction(loginForm.Login, loginForm.Password));
         }
         catch (Exception)
         {
-            isLoading = false;
             isFormError = true;
         }
+
         StateHasChanged();
     }
 

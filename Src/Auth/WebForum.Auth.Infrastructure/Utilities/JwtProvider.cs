@@ -15,7 +15,7 @@ public sealed class JwtProvider(
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
-    public (string token, DateTime expiresIn) GenerateToken(User user)
+    public (string token, AuthInfo authInfo) GenerateToken(User user)
     {
         var claims = new Claim[]
         {
@@ -35,7 +35,13 @@ public sealed class JwtProvider(
             expires: expires
         );
         var strToken = new JwtSecurityTokenHandler().WriteToken(token);
+        var authInfo = AuthInfo.Create(
+            user.Id,
+            user.Login,
+            user.Permissions,
+            expires
+        );
 
-        return (strToken, expires);
+        return (strToken, authInfo);
     }
 }

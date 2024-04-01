@@ -17,13 +17,18 @@ public class Auth(
         GetAccessTokenRequest request,
         CancellationToken cancellationToken)
     {
-        var (token, expiresIn) = await sender.Send(
+        var (token, authInfo) = await sender.Send(
             new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
         );
-        
+
         HttpContext.Response.Cookies.Append("some-cookies", token);
 
-        return Ok(new GetAccessTokenResponse(expiresIn));
+        return Ok(new GetAccessTokenResponse(
+            authInfo.Id,
+            authInfo.Login,
+            authInfo.Permissions.ToString(),
+            authInfo.ExpiresIn
+        ));
     }
 
     [HttpDelete("access-token")]

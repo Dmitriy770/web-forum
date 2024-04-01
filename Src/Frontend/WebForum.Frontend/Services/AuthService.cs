@@ -17,7 +17,7 @@ public class AuthService(
             new { login, password },
             cancellationToken);
 
-        var accessToken = await response.Content.ReadFromJsonAsync<AccessToken>(cancellationToken);
+        var accessToken = await response.Content.ReadFromJsonAsync<AuthInfo>(cancellationToken);
         if (accessToken is null)
         {
             throw new Exception();

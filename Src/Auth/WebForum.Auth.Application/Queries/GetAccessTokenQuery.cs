@@ -1,7 +1,7 @@
 ﻿using System.Security.Authentication;
 using MediatR;
 using WebForum.Auth.Application.Interfaces;
-using WebForum.Auth.Domain.Exceptions;
+using WebForum.Auth.Domain.Models;
 
 namespace WebForum.Auth.Application.Queries;
 
@@ -12,7 +12,7 @@ public record GetAccessTokenQuery(
 
 public record GetAccessTokenResult(
     string Token,
-    DateTime ExpiresIn
+    AuthInfo AuthInfo
 );
 
 internal sealed class GetAccessTokenQueryHandler(
@@ -34,7 +34,7 @@ internal sealed class GetAccessTokenQueryHandler(
             throw new InvalidCredentialException();
         }
 
-        var (token, expiresIn) = jwtProvider.GenerateToken(user);
-        return new GetAccessTokenResult(token, expiresIn);
+        var (token, authInfo) = jwtProvider.GenerateToken(user);
+        return new GetAccessTokenResult(token, authInfo);
     }
 }

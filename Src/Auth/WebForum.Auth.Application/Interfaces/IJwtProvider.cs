@@ -4,5 +4,5 @@ namespace WebForum.Auth.Application.Interfaces;
 
 public interface IJwtProvider
 {
-    public (string token, DateTime expiresIn) GenerateToken(User user);
+    public (string token, AuthInfo authInfo) GenerateToken(User user);
 }

@@ -1,7 +1,13 @@
-﻿@using WebForum.Frontend.Services.Interfaces
+﻿@using Fluxor
+@using WebForum.Frontend.States.AuthState
+@using WebForum.Frontend.States.AuthState.Actions
 
-@inject IAuthService AuthService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<AuthState> AuthState
 @inject NavigationManager Navigation
+
+<Fluxor.Blazor.Web.StoreInitializer/>
 
 <Router AppAssembly="@typeof(App).Assembly"
         OnNavigateAsync="OnNavigateAsync">
@@ -22,7 +28,7 @@
     private async Task OnNavigateAsync(NavigationContext context)
     {
         if (!(context.Path.StartsWith("login") || context.Path.StartsWith("registration"))
-            && !await AuthService.IsLogin(context.CancellationToken))
+            && AuthState.Value.Status != AuthStatus.LogIn)
         {
             Navigation.NavigateTo("login");
         }
