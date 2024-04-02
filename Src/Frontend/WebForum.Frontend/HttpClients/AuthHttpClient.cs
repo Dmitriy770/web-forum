@@ -13,7 +13,7 @@ public class AuthHttpClient(
             "/api/auth/access-token",
             new { login, password },
             cancellationToken);
-
+        
         return await response.Content.ReadFromJsonAsync<AuthInfo>();
     }
 
