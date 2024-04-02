@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@page "/signin"
 @using Fluxor
 @using WebForum.Frontend.States.AuthState
 @using WebForum.Frontend.States.AuthState.Actions
@@ -7,20 +7,21 @@
 
 @inject IState<AuthState> AuthState
 @inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
 
-<EditForm Model="@loginForm"
+<EditForm Model="@signInForm"
           OnValidSubmit="OnSubmit"
-          class="mx-auto d-flex flex-column justify-center"
-          style="height: 80%; width: 400px;">
+          class="mx-auto d-flex flex-column justify-center align-stretch"
+          style="height: 90vh; width: 400px;">
     <MudCard>
         <MudCardContent>
             <MudTextField Label="Login"
                           Variant="Variant.Outlined"
-                          @bind-Value="loginForm.Login"
+                          @bind-Value="signInForm.Login"
                           Class="pb-4"/>
             <MudTextField Label="Password"
                           Variant="Variant.Outlined"
-                          @bind-Value="loginForm.Password"
+                          @bind-Value="signInForm.Password"
                           InputType="InputType.Password"
                           Class="pb-4"/>
             <MudText Color="Color.Error"
@@ -41,24 +42,33 @@
                 }
                 else
                 {
-                    <MudText>Login</MudText>
+                    <MudText>Sign In</MudText>
                 }
             </MudButton>
         </MudCardActions>
     </MudCard>
+    
+    <MudLink OnClick="OnSignUpClick"
+             Class="mt-8 align-self-center"
+             >Sign up</MudLink>
 </EditForm>
 
 @code {
-    private readonly LoginForm loginForm = new LoginForm();
+    private readonly SignInForm signInForm = new SignInForm();
 
     private void OnSubmit()
     {
-        Dispatcher.Dispatch(new AuthLogInStartAction(loginForm.Login, loginForm.Password));
+        Dispatcher.Dispatch(new AuthLogInStartAction(signInForm.Login, signInForm.Password));
 
         StateHasChanged();
     }
+
+    private void OnSignUpClick()
+    {
+        Navigation.NavigateTo("/signup");
+    }
     
-    private class LoginForm
+    private class SignInForm
     {
         public string Login { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;

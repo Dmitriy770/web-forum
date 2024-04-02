@@ -20,7 +20,7 @@ public class AuthEffects(
 
         try
         {
-            var authInfo = await http.LogIn(action.Login, action.Password, CancellationToken.None);
+            var authInfo = await http.SignIn(action.Login, action.Password, CancellationToken.None);
             dispatcher.Dispatch(new AuthLogInSuccessAction(authInfo));
             navigation.NavigateTo("");
         }
@@ -43,7 +43,7 @@ public class AuthEffects(
 
         try
         {
-            await http.LogOut(CancellationToken.None);
+            await http.SignOut(CancellationToken.None);
             dispatcher.Dispatch(new AuthLogOutSuccessAction());
             navigation.NavigateTo("/login");
         }

@@ -1,0 +1,85 @@
+﻿@page "/signup"
+
+@using WebForum.Frontend.HttpClients
+
+@inject AuthHttpClient AuthHttpClient
+@inject NavigationManager Navigation
+
+<EditForm Model="@signUpForm"
+          OnValidSubmit="OnSubmit"
+          @onfocus="OnFocus"
+          class="mx-auto d-flex flex-column justify-center"
+          style="height: 80%; width: 400px;">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Login"
+                          Variant="Variant.Outlined"
+                          @bind-Value="signUpForm.Login"
+                          Class="pb-4"/>
+            <MudTextField Label="Password"
+                          Variant="Variant.Outlined"
+                          @bind-Value="signUpForm.Password"
+                          InputType="InputType.Password"
+                          Class="pb-4"/>
+            <MudTextField Label="Repeat password"
+                          Variant="Variant.Outlined"
+                          @bind-Value="signUpForm.RepeatPassword"
+                          InputType="InputType.Password"
+                          Class="pb-4"/>
+            <MudText Color="Color.Error"
+                     Style="min-height: 30px">
+                @error
+            </MudText>
+        </MudCardContent>
+        <MudCardActions Class="d-flex flex-column align-stretch">
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Size="Size.Large"
+                       Color="Color.Primary"
+                       Disabled="isLoading">
+                @if (isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>Sign Up</MudText>
+                }
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    private readonly SignUpForm signUpForm = new SignUpForm();
+    private string error = string.Empty;
+    private bool isLoading = false;
+
+    private void OnFocus()
+    {
+        error = "";
+    }
+
+    private async Task OnSubmit()
+    {
+        if (string.Compare(signUpForm.Password, signUpForm.RepeatPassword, StringComparison.Ordinal) != 0)
+        {
+            error = "Invalid password or login";
+            return;
+        }
+
+        await AuthHttpClient.SignUp(signUpForm.Login, signUpForm.Password, CancellationToken.None);
+        Navigation.NavigateTo("/login");
+
+        StateHasChanged();
+    }
+
+    private class SignUpForm
+    {
+        public string Login { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string RepeatPassword { get; set; } = string.Empty;
+    }
+
+}

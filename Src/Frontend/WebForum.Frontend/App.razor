@@ -24,15 +24,30 @@
 
 @code{
 
+    private readonly string[] noAuthPages = { "signin", "signup" };
+
     private Task OnNavigateAsync(NavigationContext context)
     {
-        if (!(context.Path.StartsWith("login") || context.Path.StartsWith("registration"))
-            && !AuthState.Value.IsLogInEnd())
+        Console.WriteLine(context.Path);
+        if (IsAuthNeed(context.Path) && !AuthState.Value.IsLogInEnd())
         {
-            Navigation.NavigateTo("login");
+            Navigation.NavigateTo("signin");
         }
 
         return Task.CompletedTask;
+    }
+
+    private bool IsAuthNeed(string path)
+    {
+        foreach (var noAuthPage in noAuthPages)
+        {
+            if (string.Compare(path, noAuthPage, StringComparison.Ordinal) == 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
