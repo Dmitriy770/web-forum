@@ -1,5 +1,32 @@
-﻿<MudButton>Log out</MudButton>
+﻿@using Fluxor
+@using WebForum.Frontend.States.AuthState
+@using WebForum.Frontend.States.AuthState.Actions
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<AuthState> AuthState
+@inject IDispatcher Dispatcher
+
+<MudButton @onclick="OnClick"
+           Variant="Variant.Filled"
+           Size="Size.Large"
+           Color="Color.Primary"
+           Disabled="AuthState.Value.IsLoading">
+    @if (AuthState.Value.IsLoading)
+    {
+        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+        <MudText Class="ms-2">Processing</MudText>
+    }
+    else
+    {
+        <MudText>Log out</MudText>
+    }
+</MudButton>
 
 @code {
-    
+
+    private void OnClick()
+    {
+        Dispatcher.Dispatch(new AuthLogOutStartAction());
+    }
 }

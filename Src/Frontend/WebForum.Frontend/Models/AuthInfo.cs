@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace WebForum.Frontend.Services.Models;
+﻿namespace WebForum.Frontend.Models;
 
 public record AuthInfo(
     Guid Id,

@@ -6,17 +6,39 @@ namespace WebForum.Frontend.States.AuthState;
 public static class AuthReducers
 {
     [ReducerMethod]
-    public static AuthState ReduceLoginStartAction(AuthState state, AuthLoginStartAction action) =>
+    public static AuthState ReduceLogInStartAction(AuthState state, AuthLogInStartAction action) =>
         new AuthState
         {
-            Status = AuthStatus.Loading
+            IsLoading = true,
         };
 
     [ReducerMethod]
-    public static AuthState ReduceLoginResultAction(AuthState state, AuthLoginResultAction action) =>
+    public static AuthState ReduceLogInSuccessAction(AuthState state, AuthLogInSuccessAction action) =>
         new AuthState
         {
-            Status = AuthStatus.LogIn,
+            IsLoading = false,
             Info = action.Info
+        };
+    
+    [ReducerMethod]
+    public static AuthState ReduceAuthLogOutStartAction(AuthState state, AuthLogOutStartAction action) =>
+        state with
+        {
+            IsLoading = true
+        };
+
+    [ReducerMethod]
+    public static AuthState ReduceAuthLogOutSuccess(AuthState state, AuthLogOutSuccessAction action) =>
+        new AuthState
+        {
+            IsLoading = false
+        };
+
+    [ReducerMethod]
+    public static AuthState ReduceAuthErrorAction(AuthState state, AuthErrorAction action) =>
+        state with
+        {
+            IsLoading = false,
+            Error = action.Error
         };
 }

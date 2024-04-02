@@ -1,6 +1,5 @@
 ﻿@using Fluxor
 @using WebForum.Frontend.States.AuthState
-@using WebForum.Frontend.States.AuthState.Actions
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
@@ -25,13 +24,15 @@
 
 @code{
 
-    private async Task OnNavigateAsync(NavigationContext context)
+    private Task OnNavigateAsync(NavigationContext context)
     {
         if (!(context.Path.StartsWith("login") || context.Path.StartsWith("registration"))
-            && AuthState.Value.Status != AuthStatus.LogIn)
+            && !AuthState.Value.IsLogInEnd())
         {
             Navigation.NavigateTo("login");
         }
+
+        return Task.CompletedTask;
     }
 
 }

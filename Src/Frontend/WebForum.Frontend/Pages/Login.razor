@@ -5,7 +5,6 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject NavigationManager Navigation
 @inject IState<AuthState> AuthState
 @inject IDispatcher Dispatcher
 
@@ -13,37 +12,29 @@
           OnValidSubmit="OnSubmit"
           class="mx-auto d-flex flex-column justify-center"
           style="height: 80%; width: 400px;">
-    <DataAnnotationsValidator/>
     <MudCard>
         <MudCardContent>
             <MudTextField Label="Login"
-                          Error="isFormError"
-                          @onfocus="OnFocus"
                           Variant="Variant.Outlined"
                           @bind-Value="loginForm.Login"
                           Class="pb-4"/>
             <MudTextField Label="Password"
-                          Error="isFormError"
-                          @onfocus="OnFocus"
                           Variant="Variant.Outlined"
                           @bind-Value="loginForm.Password"
                           InputType="InputType.Password"
                           Class="pb-4"/>
-            @if (isFormError)
-            {
-                <MudText Color="Color.Error">
-                    Wrong login or password
-                </MudText>
-            }
+            <MudText Color="Color.Error"
+                     Style="min-height: 30px">
+                @AuthState.Value.Error
+            </MudText>
         </MudCardContent>
-        <MudCardActions>
+        <MudCardActions Class="d-flex flex-column align-stretch">
             <MudButton ButtonType="ButtonType.Submit"
                        Variant="Variant.Filled"
                        Size="Size.Large"
                        Color="Color.Primary"
-                       Disabled="AuthState.Value.Status == AuthStatus.Loading"
-                       Class="mx-auto">
-                @if (AuthState.Value.Status == AuthStatus.Loading)
+                       Disabled="AuthState.Value.IsLoading">
+                @if (AuthState.Value.IsLoading)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
                     <MudText Class="ms-2">Processing</MudText>
@@ -59,37 +50,17 @@
 
 @code {
     private readonly LoginForm loginForm = new LoginForm();
-    private bool isFormError = false;
-
-    private class LoginForm
-    {
-        public string? Login { get; set; }
-        public string? Password { get; set; }
-    }
-
-    private void OnFocus()
-    {
-        isFormError = false;
-    }
 
     private void OnSubmit()
     {
-        if (loginForm.Login is null || loginForm.Password is null)
-        {
-            isFormError = true;
-            return;
-        }
-
-        try
-        {
-            Dispatcher.Dispatch(new AuthLoginStartAction(loginForm.Login, loginForm.Password));
-        }
-        catch (Exception)
-        {
-            isFormError = true;
-        }
+        Dispatcher.Dispatch(new AuthLogInStartAction(loginForm.Login, loginForm.Password));
 
         StateHasChanged();
     }
-
+    
+    private class LoginForm
+    {
+        public string Login { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 }

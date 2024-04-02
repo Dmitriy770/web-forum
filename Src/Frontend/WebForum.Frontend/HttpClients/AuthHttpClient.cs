@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using WebForum.Frontend.Services.Models;
+using WebForum.Frontend.Models;
 
 namespace WebForum.Frontend.HttpClients;
 
