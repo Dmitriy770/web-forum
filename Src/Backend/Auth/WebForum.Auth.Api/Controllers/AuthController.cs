@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebForum.Auth.Api.ExceptionFilters;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
 using WebForum.Auth.Application.Queries;
@@ -8,7 +9,8 @@ namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class Auth(
+[UserExceptionFilter]
+public class AuthController(
     ISender sender
 ) : ControllerBase
 {
