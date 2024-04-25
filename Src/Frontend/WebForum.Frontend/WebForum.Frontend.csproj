@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="FluentResults" Version="3.15.2" />
         <PackageReference Include="Fluxor" Version="5.9.1" />
         <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
         <PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.1" />
@@ -26,6 +27,10 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Common\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

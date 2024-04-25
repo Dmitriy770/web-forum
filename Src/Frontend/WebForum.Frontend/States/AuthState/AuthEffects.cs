@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using Common.FluentResult;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using WebForum.Frontend.HttpClients;
@@ -16,22 +16,19 @@ public class AuthEffects(
     {
         using var scope = serviceScopeFactory.CreateScope();
 
-        var http = scope.ServiceProvider.GetService<AuthHttpClient>()!;
+        var http = scope.ServiceProvider.GetRequiredService<AuthHttpClient>();
 
-        try
+        var authResult = await http.SignIn(action.Login, action.Password, CancellationToken.None);
+
+        authResult.Match(authInfo =>
         {
-            var authInfo = await http.SignIn(action.Login, action.Password, CancellationToken.None);
             dispatcher.Dispatch(new AuthLogInSuccessAction(authInfo));
             navigation.NavigateTo("");
-        }
-        catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+        },
+        errors =>
         {
-            dispatcher.Dispatch(new AuthErrorAction("Wrong password or login"));
-        }
-        catch (HttpRequestException e)
-        {
-            dispatcher.Dispatch(new AuthErrorAction(e.Message));
-        }
+            dispatcher.Dispatch(new AuthErrorAction(string.Join(", ", errors)));
+        });
     }
 
     [EffectMethod]
@@ -39,7 +36,7 @@ public class AuthEffects(
     {
         using var scope = serviceScopeFactory.CreateScope();
 
-        var http = scope.ServiceProvider.GetService<AuthHttpClient>();
+        var http = scope.ServiceProvider.GetRequiredService<AuthHttpClient>();
 
         try
         {
