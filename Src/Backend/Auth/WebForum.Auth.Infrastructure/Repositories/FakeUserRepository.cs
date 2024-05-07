@@ -3,28 +3,31 @@ using WebForum.Auth.Domain.Models;
 
 namespace WebForum.Auth.Infrastructure.Repositories;
 
-public class FakeUserRepository : IUserRepository
+public sealed class FakeUserRepository : IUserRepository
 {
-    private static List<User> _users = []; 
+    private static readonly List<User> Users = []; 
     public Task Save(User user, CancellationToken cancellationToken)
     {
-        _users.Add(user);
+        Users.Add(user);
         return Task.CompletedTask;
     }
 
     public Task Delete(Guid id, CancellationToken cancellationToken)
     {
-        _users = _users.Where(u => u.Id != id).ToList();
+        if (Users.FirstOrDefault(u => u.Id == id) is { } user)
+        {
+            Users.Remove(user);
+        }
         return Task.CompletedTask;
     }
 
     public Task<User?> FindByUserId(Guid id, CancellationToken cancellationToken)
     {
-        return Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
+        return Task.FromResult(Users.FirstOrDefault(u => u.Id == id, null));
     }
 
     public Task<User?> FindByLogin(string login, CancellationToken cancellationToken)
     {
-        return Task.FromResult(_users.FirstOrDefault(u => string.Compare(u.Login, login, StringComparison.Ordinal) == 0));
+        return Task.FromResult(Users.FirstOrDefault(u => string.Compare(u.Login, login, StringComparison.Ordinal) == 0, null));
     }
 }

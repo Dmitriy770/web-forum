@@ -1,10 +1,4 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using WebForum.Auth.Api.Authorization;
-using WebForum.Auth.Application.Interfaces;
+﻿using WebForum.Auth.Application.Interfaces;
 using WebForum.Auth.Application.Queries;
 using WebForum.Auth.Infrastructure.Options;
 using WebForum.Auth.Infrastructure.Repositories;

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.CookiePolicy;
 using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Api.Extensions;
+using WebForum.Core.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddWebForumAuth(builder.Configuration);
+builder.Services.AddWebForumCore();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

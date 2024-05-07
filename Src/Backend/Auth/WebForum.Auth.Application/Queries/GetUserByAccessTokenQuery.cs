@@ -4,16 +4,16 @@ using WebForum.Auth.Domain.Models;
 
 namespace WebForum.Auth.Application.Queries;
 
-public record GetUserByTokenQuery(
+public record GetUserByAccessTokenQuery(
     string AccessToken
 ) : IRequest<User?>;
 
-internal sealed class GetUserByTokenQueryHandler(
+internal sealed class GetUserByAccessTokenQueryHandler(
     IUserRepository userRepository,
     IJwtProvider jwtProvider
-) : IRequestHandler<GetUserByTokenQuery, User?>
+) : IRequestHandler<GetUserByAccessTokenQuery, User?>
 {
-    public async Task<User?> Handle(GetUserByTokenQuery request, CancellationToken cancellationToken)
+    public async Task<User?> Handle(GetUserByAccessTokenQuery request, CancellationToken cancellationToken)
     {
         var accessToken = request.AccessToken;
 

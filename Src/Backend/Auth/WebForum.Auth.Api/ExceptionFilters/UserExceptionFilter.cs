@@ -7,7 +7,7 @@ using WebForum.Auth.Domain.Exceptions;
 namespace WebForum.Auth.Api.ExceptionFilters;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class UserExceptionFilter : Attribute, IExceptionFilter
+public sealed class UserExceptionFilter : Attribute, IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {

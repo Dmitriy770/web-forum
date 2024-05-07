@@ -9,7 +9,7 @@ namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(
+public sealed class AuthController(
     ISender sender
 ) : ControllerBase
 {

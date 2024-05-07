@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using WebForum.Auth.Application.Queries;
 
 namespace WebForum.Auth.Api.Authorization;
@@ -22,25 +23,24 @@ public class AuthorizationFilter(
                 return Results.Unauthorized();
             }
 
-            var user = await sender.Send(new GetUserByTokenQuery(accessToken));
+            var user = await sender.Send(new GetUserByAccessTokenQuery(accessToken));
             if (user is null)
             {
                 return Results.Unauthorized();
             }
-            
-            context.HttpContext.Request.Headers.Append("user-id", user.Id.ToString());
+            context.HttpContext.Items.Add("UserId", user.Id);
 
             if (endpoint.Metadata.GetMetadata<AuthorizationAttribute>() is {} authorizationAttribute )
             {
                 var requiredPermissions = authorizationAttribute.Permissions;
-
-                if ((1 << (int)requiredPermissions & (int)user.Permissions) != 0)
+                
+                if (((int)requiredPermissions & (int)user.Permissions) != 0)
                 {
                     return await next(context);
                 }
                 else
                 {
-                    return Results.Forbid();
+                    return Results.Problem(statusCode: 403);
                 }
             }
             else

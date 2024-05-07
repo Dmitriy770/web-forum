@@ -49,20 +49,22 @@ public sealed class JwtProvider(
             {
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _signingCredentials.Key
+                IssuerSigningKey = _signingCredentials.Key,
+                
+                ValidateAudience = false,
+                ValidateIssuer = false
             };
-
+            
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenValidationResult = await tokenHandler.ValidateTokenAsync(accessToken, validationParameters);
-
+            
             var userId = Guid.Empty;
             if (tokenValidationResult.IsValid)
             {
                 tokenValidationResult.Claims.TryGetValue("UserId", out var userIdObject);
-                Console.WriteLine(userIdObject.GetType());
                 userId = Guid.Parse(userIdObject.ToString());
             }
-
+            
             return (tokenValidationResult.IsValid, userId);
     }
 }
