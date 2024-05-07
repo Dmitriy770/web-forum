@@ -4,10 +4,10 @@ public record AuthInfo
 {
     public Guid Id { get; init; }
     public string Login { get; init; }
-    public UserPermissions Permissions { get; init; }
+    public Permissions Permissions { get; init; }
     public DateTime ExpiresIn { get; init; }
 
-    private AuthInfo(Guid id, string login, UserPermissions permissions, DateTime expiresIn)
+    private AuthInfo(Guid id, string login, Permissions permissions, DateTime expiresIn)
     {
         Id = id;
         Login = login;
@@ -15,7 +15,7 @@ public record AuthInfo
         ExpiresIn = expiresIn;
     }
 
-    public static AuthInfo Create(Guid id, string login, UserPermissions permissions, DateTime expiresIn)
+    public static AuthInfo Create(Guid id, string login, Permissions permissions, DateTime expiresIn)
     {
         return new AuthInfo(id, login, permissions, expiresIn);
     }

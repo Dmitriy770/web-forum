@@ -6,9 +6,9 @@ public sealed class User
     public string Login { get; }
     public string HashedPassword { get; }
     
-    public UserPermissions Permissions { get; }
+    public Permissions Permissions { get; }
 
-    private User(Guid id, string login, string hashedPassword, UserPermissions permissions)
+    private User(Guid id, string login, string hashedPassword, Permissions permissions)
     {
         Id = id;
         Login = login;
@@ -16,7 +16,7 @@ public sealed class User
         Permissions = permissions;
     }
 
-    public static User Create(Guid id, string login, string hashPassword, UserPermissions permissions)
+    public static User Create(Guid id, string login, string hashPassword, Permissions permissions)
     {
         return new User(id, login, hashPassword, permissions);
     }

@@ -1,22 +1,22 @@
-﻿using System.Runtime.CompilerServices;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebForum.Auth.Api.Authorization;
+using WebForum.Auth.Api.ExceptionFilters;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
 using WebForum.Auth.Application.Commands;
-using WebForum.Auth.Domain.Models;
 
 namespace WebForum.Auth.Api.Controllers;
 
 [ApiController]
 [Route("user")]
+[UserExceptionFilter]
 public sealed class UserController(
     ISender sender
 ) : ControllerBase
 {
     [HttpPost]
+    [NoAuthorization]
     public async Task<IActionResult> Create(CreateUserRequest request, CancellationToken cancellationToken)
     {
         var userId = await sender.Send(new CreateUserCommand(request.Login, request.Password), cancellationToken);
@@ -30,9 +30,10 @@ public sealed class UserController(
         throw new NotImplementedException();
     }
 
-    [HttpDelete]
-    public IActionResult Delete(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await sender.Send(new DeleteUserCommand(id), cancellationToken);
+        return Ok();
     }
 }

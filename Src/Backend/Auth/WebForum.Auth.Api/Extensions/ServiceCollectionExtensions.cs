@@ -20,9 +20,6 @@ public static class ServiceCollectionExtensions
         services.Configure<JwtOptions>(config.GetSection(nameof(JwtOptions)));
         
         // Api
-        services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
-        services.AddApiAuthentication();
         services.AddControllers();
 
         // Application
@@ -33,38 +30,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtProvider, JwtProvider>();
         services.AddSingleton<IUserRepository, FakeUserRepository>();
 
-        return services;
-    }
-
-    private static IServiceCollection AddApiAuthentication(this IServiceCollection services)
-    {
-        var jwtOptions = services.BuildServiceProvider().GetService<IOptions<JwtOptions>>()!.Value;
-        Console.WriteLine(jwtOptions);
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["some-cookies"];
-                        
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
-        services.AddAuthentication();
-        
         return services;
     }
 }

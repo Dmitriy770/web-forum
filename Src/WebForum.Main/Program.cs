@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.CookiePolicy;
+using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddWebForumAuth(builder.Configuration);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -22,8 +23,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseWebForumAuth();
-app.MapControllers();
-app.UseHttpsRedirection();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.SameAsRequest
+});
+
+app.MapGroup(String.Empty)
+    .AddEndpointFilter<AuthorizationFilter>()
+    .MapControllers();
 
 await app.RunAsync();

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Common.Guards;
+using MediatR;
 using WebForum.Auth.Application.Interfaces;
 using WebForum.Auth.Domain.Exceptions;
 using WebForum.Auth.Domain.Models;
@@ -17,17 +18,19 @@ internal sealed class CreateUserCommandHandler(
 {
     public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        if (await userRepository.FindByLogin(request.Login, cancellationToken) is not null)
+        var (login, password) = request;
+        
+        if (await userRepository.FindByLogin(login, cancellationToken) is not null)
         {
-            throw new UserAlreadyExistsException(request.Login);
+            throw new UserAlreadyExistsException(login);
         }
         
         var userId = Guid.NewGuid();
-        var hashedPassword = hasher.Hash(request.Password);
+        var hashedPassword = hasher.Hash(password);
 
-        var user = User.Create(userId, request.Login, hashedPassword, UserPermissions.CanPublish | UserPermissions.CanHideAnyPosts);
+        var user = User.Create(userId, login, hashedPassword, Permissions.CanPublish);
         await userRepository.Save(user, cancellationToken);
 
-        return userId;
+        return user.Id;
     }
 }
