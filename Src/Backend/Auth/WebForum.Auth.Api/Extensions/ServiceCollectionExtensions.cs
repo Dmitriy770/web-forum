@@ -13,9 +13,6 @@ public static class ServiceCollectionExtensions
         //Configuration
         services.Configure<JwtOptions>(config.GetSection(nameof(JwtOptions)));
         
-        // Api
-        services.AddControllers();
-
         // Application
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAccessTokenQuery).Assembly));
 

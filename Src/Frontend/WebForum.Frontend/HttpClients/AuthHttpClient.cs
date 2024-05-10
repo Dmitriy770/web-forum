@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Common.Nullable;
 using FluentResults;
+using WebForum.Frontend.HttpClients.Responses;
 using WebForum.Frontend.Models;
 
 namespace WebForum.Frontend.HttpClients;
@@ -16,7 +17,7 @@ public class AuthHttpClient(
             "/api/auth/access-token",
             new { login, password },
             cancellationToken);
-        
+
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
@@ -35,15 +36,18 @@ public class AuthHttpClient(
     public async Task SignOut(CancellationToken cancellationToken)
     {
         await http.DeleteAsync(
-            "api/auth/access-token",
+            "/api/auth/access-token",
             cancellationToken);
     }
 
-    public async Task SignUp(string login, string password, CancellationToken cancellationToken)
+    public async Task<Guid> SignUp(string login, string password, CancellationToken cancellationToken)
     {
-        await http.PostAsJsonAsync(
-            "/user",
+        var response = await http.PostAsJsonAsync(
+            "/api/auth/user",
             new { login, password },
             cancellationToken);
+
+        var content = (await response.Content.ReadFromJsonAsync<CreateUserResponse>(cancellationToken))!;
+        return content.UserId;
     }
 }

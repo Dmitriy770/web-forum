@@ -1,39 +1,70 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using WebForum.Auth.Api.Authorization;
-using WebForum.Auth.Api.ExceptionFilters;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
 using WebForum.Auth.Application.Commands;
+using WebForum.Auth.Domain.Exceptions;
 
 namespace WebForum.Auth.Api.Controllers;
 
-[ApiController]
-[Route("user")]
-[UserExceptionFilter]
-public sealed class UserController(
-    ISender sender
-) : ControllerBase
+public sealed class UserController
 {
-    [HttpPost]
+    public void Register(WebApplication app)
+    {
+        var group = app.MapGroup("/api/auth/user")
+            .AddEndpointFilter<AuthorizationFilter>();
+
+        group.MapPost("/", CreateUser)
+            .Produces<CreateUserResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+        group.MapDelete("/", DeleteUser)
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+    }
+
     [NoAuthorization]
-    public async Task<IActionResult> Create(CreateUserRequest request, CancellationToken cancellationToken)
+    private async Task<IResult> CreateUser(
+        CreateUserRequest request,
+        CancellationToken cancellationToken,
+        ISender sender)
     {
-        var userId = await sender.Send(new CreateUserCommand(request.Login, request.Password), cancellationToken);
-
-        return Ok(new CreateUserResponse(userId));
+        try
+        {
+            var userId = await sender.Send(new CreateUserCommand(request.Login, request.Password), cancellationToken);
+            return Results.Ok(new CreateUserResponse(userId));
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
     }
 
-    [HttpPut]
-    public IActionResult Update()
+    private async Task<IResult> DeleteUser(
+        Guid id,
+        CancellationToken cancellationToken,
+        ISender sender)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await sender.Send(new DeleteUserCommand(id), cancellationToken);
+            return Results.Ok();
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    private IResult HandleException(Exception exception)
     {
-        await sender.Send(new DeleteUserCommand(id), cancellationToken);
-        return Ok();
+        return exception switch
+        {
+            UserAlreadyExistsException => Results.Conflict(),
+            UserNotFoundException => Results.NotFound(),
+            _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
+        };
     }
 }

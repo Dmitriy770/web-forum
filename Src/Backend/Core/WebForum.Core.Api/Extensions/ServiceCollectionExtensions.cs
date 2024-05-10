@@ -9,9 +9,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddWebForumCore(this IServiceCollection services)
     {
-        // Api
-        services.AddControllers();
-
         // Application
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetProfileByUserIdQuery).Assembly));
 

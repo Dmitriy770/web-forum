@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using WebForum.Auth.Application.Queries;
 
 namespace WebForum.Auth.Api.Authorization;

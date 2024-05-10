@@ -2,14 +2,15 @@
 
 @inject NavigationManager Navigation
 
-
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new test.
-
-<LogOutButton />
+<LayoutView Layout="@typeof(HomeLayout)">
+    <PageTitle>Home</PageTitle>
+    
+    <h1>Hello, world!</h1>
+    
+    Welcome to your new test.
+    
+    <LogOutButton />
+</LayoutView>
 
 @code
 {

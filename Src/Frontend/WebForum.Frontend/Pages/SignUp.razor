@@ -1,35 +1,40 @@
 ﻿@page "/signup"
 
 @using WebForum.Frontend.HttpClients
+@using System.ComponentModel.DataAnnotations
 
 @inject AuthHttpClient AuthHttpClient
+@inject ProfileHttpClient ProfileHttpClient
 @inject NavigationManager Navigation
 
 <EditForm Model="@signUpForm"
           OnValidSubmit="OnSubmit"
-          @onfocus="OnFocus"
           class="mx-auto d-flex flex-column justify-center"
           style="height: 80%; width: 400px;">
     <MudCard>
         <MudCardContent>
             <MudTextField Label="Login"
-                          Variant="Variant.Outlined"
                           @bind-Value="signUpForm.Login"
-                          Class="pb-4"/>
+                          For="@(() => signUpForm.Login)"
+                          HelperText="Login"/>
+            <MudTextField Label="Display name"
+                          @bind-Value="signUpForm.DisplayName"
+                          For="@(() => signUpForm.DisplayName)"
+                          HelperText="Default name is login"/>
+            <MudTextField Label="Avatar URI"
+                          @bind-Value="signUpForm.AvatarUri"
+                          For="@(() => signUpForm.AvatarUri)"
+                          HelperText="Avatar uri"/>
             <MudTextField Label="Password"
-                          Variant="Variant.Outlined"
                           @bind-Value="signUpForm.Password"
+                          For="@(() => signUpForm.Password)"
                           InputType="InputType.Password"
-                          Class="pb-4"/>
+                          HelperText="Password"/>
             <MudTextField Label="Repeat password"
-                          Variant="Variant.Outlined"
                           @bind-Value="signUpForm.RepeatPassword"
+                          For="@(() => signUpForm.Password)"
                           InputType="InputType.Password"
-                          Class="pb-4"/>
-            <MudText Color="Color.Error"
-                     Style="min-height: 30px">
-                @error
-            </MudText>
+                          HelperText="Repeat password"/>
         </MudCardContent>
         <MudCardActions Class="d-flex flex-column align-stretch">
             <MudButton ButtonType="ButtonType.Submit"
@@ -52,33 +57,47 @@
 </EditForm>
 
 @code {
-    private readonly SignUpForm signUpForm = new SignUpForm();
-    private string error = string.Empty;
+    private readonly SignUpForm signUpForm = new();
     private bool isLoading = false;
 
-    private void OnFocus()
+    private async Task OnSubmit(EditContext context)
     {
-        error = "";
-    }
-
-    private async Task OnSubmit()
-    {
-        if (string.Compare(signUpForm.Password, signUpForm.RepeatPassword, StringComparison.Ordinal) != 0)
+        if (!context.Validate())
         {
-            error = "Invalid password or login";
             return;
         }
-
-        await AuthHttpClient.SignUp(signUpForm.Login, signUpForm.Password, CancellationToken.None);
+        isLoading = true;
+        
+        var userId = await AuthHttpClient.SignUp(signUpForm.Login, signUpForm.Password, CancellationToken.None);
+        var avatarUri = string.IsNullOrEmpty(signUpForm.AvatarUri) ? null : new Uri(signUpForm.AvatarUri);
+        await ProfileHttpClient.Create(userId, signUpForm.DisplayName, avatarUri, CancellationToken.None);
+        
         Navigation.NavigateTo("/login");
 
-        StateHasChanged();
+        isLoading = false;
     }
 
     private class SignUpForm
     {
+        [Required]
+        [RegularExpression("[a-z_.0-9]*", ErrorMessage = "Only numbers, letters, underscores and periods")]
+        [MinLength(2, ErrorMessage = "Minimum length 2")]
+        [MaxLength(12, ErrorMessage = "Maximum length 12")]
         public string Login { get; set; } = string.Empty;
+
+        [MinLength(2, ErrorMessage = "Minimum length 2")]
+        [MaxLength(12, ErrorMessage = "Maximum length 12")]
+        public string DisplayName { get; set; } = string.Empty;
+
+        [RegularExpression("(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:(0-9)*)*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&%\\$#_]*)?", ErrorMessage = "Invalid URI")]
+        public string AvatarUri { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(10, ErrorMessage = "Minimum length 10")]
         public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [Compare(nameof(Password), ErrorMessage = "Passwords must match")]
         public string RepeatPassword { get; set; } = string.Empty;
     }
 

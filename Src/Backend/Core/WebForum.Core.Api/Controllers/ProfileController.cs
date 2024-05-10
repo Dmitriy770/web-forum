@@ -1,39 +1,76 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using WebForum.Auth.Api.Authorization;
-using WebForum.Core.Api.ExceptionFilters;
 using WebForum.Core.Api.Requests;
 using WebForum.Core.Application.Commands;
 using WebForum.Core.Application.Queries;
+using WebForum.Core.Domain.Exceptions;
+using WebForum.Core.Domain.Models;
 
 namespace WebForum.Core.Api.Controllers;
 
-[ApiController]
-[Route("api/profile")]
-[ProfileExceptionFilter]
-public class ProfileController(
-    ISender sender
-) : ControllerBase
+public sealed class ProfileController
 {
-    [HttpPost("{userId:guid}")]
-    [NoAuthorization]
-    public async Task<IResult> Create(
-        Guid userId,
-        CreateProfileRequest request,
-        CancellationToken cancellationToken)
+    public void Register(WebApplication app)
     {
-        await sender.Send(new CreateProfileCommand(userId, request.DisplayName, request.AvatarUri), cancellationToken);
+        var group = app.MapGroup("/api/core/profile")
+            .AddEndpointFilter<AuthorizationFilter>();
 
-        return Results.Ok();
+        group.MapPost("/{userId:guid}", CreateProfile)
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+        group.MapGet("/{userId:guid}", GetProfileByUserId)
+            .Produces<Profile>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
     }
 
-    [HttpGet("{userId:guid}")]
-    public async Task<IResult> GetByUserId(
+    [NoAuthorization]
+    private async Task<IResult> CreateProfile(
         Guid userId,
-        CancellationToken cancellationToken)
+        CreateProfileRequest request,
+        CancellationToken cancellationToken,
+        ISender sender
+    )
     {
-        var profile = await sender.Send(new GetProfileByUserIdQuery(userId), cancellationToken);
+        try
+        {
+            await sender.Send(new CreateProfileCommand(userId, request.DisplayName, request.AvatarUri), cancellationToken);
+            return Results.Ok();
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
 
-        return Results.Ok(profile);
+    private async Task<IResult> GetProfileByUserId(
+        Guid userId,
+        CancellationToken cancellationToken,
+        ISender sender
+        )
+    {
+        try
+        {
+            var profile = await sender.Send(new GetProfileByUserIdQuery(userId), cancellationToken);
+            return Results.Ok(profile);
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
+    
+    private IResult HandleException(Exception exception)
+    {
+        return exception switch
+        {
+            ProfileNotFoundException => Results.NotFound(),
+            ProfileAlreadyExistsException => Results.Conflict(),
+            _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
+        };
     }
 }

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
@@ -7,25 +6,36 @@ using WebForum.Auth.Application.Queries;
 
 namespace WebForum.Auth.Api.Controllers;
 
-[ApiController]
-[Route("api/auth")]
-public sealed class AuthController(
-    ISender sender
-) : ControllerBase
+public sealed class AuthController
 {
-    [HttpPost("access-token")]
+    public void Register(WebApplication app)
+    {
+        var group = app.MapGroup("/api/auth/access-token")
+            .AddEndpointFilter<AuthorizationFilter>();
+        
+        group.MapPost("/", GetAccessToken)
+            .Produces<GetAccessTokenResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+        group.MapDelete("/", DeleteAccessToken)
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+    }
+
     [NoAuthorization]
-    public async Task<IActionResult> Get(
+    private async Task<IResult> GetAccessToken(
+        HttpContext context,
         GetAccessTokenRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        ISender sender
+    )
     {
         var (token, authInfo) = await sender.Send(
             new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
         );
 
-        HttpContext.Response.Cookies.Append("some-cookies", token);
+        context.Response.Cookies.Append("some-cookies", token);
 
-        return Ok(new GetAccessTokenResponse(
+        return Results.Ok(new GetAccessTokenResponse(
             authInfo.Id,
             authInfo.Login,
             authInfo.Permissions.ToString(),
@@ -33,10 +43,9 @@ public sealed class AuthController(
         ));
     }
 
-    [HttpDelete("access-token")]
-    public IActionResult Delete()
+    private IResult DeleteAccessToken(HttpContext context)
     {
-        HttpContext.Response.Cookies.Delete("some-coolies");
-        return Ok();
+        context.Response.Cookies.Delete("some-coolies");
+        return Results.Ok();
     }
 }

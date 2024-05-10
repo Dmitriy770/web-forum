@@ -26,10 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\Common\Common\Common.csproj" />
     </ItemGroup>
 

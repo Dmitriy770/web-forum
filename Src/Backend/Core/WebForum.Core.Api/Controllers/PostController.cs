@@ -2,56 +2,101 @@
 using Microsoft.AspNetCore.Mvc;
 using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Domain.Models;
-using WebForum.Core.Api.ExceptionFilters;
 using WebForum.Core.Api.Requests;
 using WebForum.Core.Api.Responses;
 using WebForum.Core.Application.Commands;
 using WebForum.Core.Application.Queries;
+using WebForum.Core.Domain.Exceptions;
+using WebForum.Core.Domain.Models;
 
 namespace WebForum.Core.Api.Controllers;
 
-[ApiController]
-[Route("api/post")]
-[PostExceptionFilter]
-public sealed class PostController(
-    ISender sender
-) : ControllerBase
+public class PostController
 {
-    [HttpGet("{id:guid}")]
-    public async Task<IResult> GetById(
-        Guid id,
-        CancellationToken cancellationToken
-    )
+    public void Register(WebApplication app)
     {
-        var post = await sender.Send(new GetPostByIdQuery(id), cancellationToken);
+        var group = app.MapGroup("/api/post")
+            .AddEndpointFilter<AuthorizationFilter>();
 
-        return Results.Ok(post);
+        group.MapGet("/{id:guid}", GetPostById)
+            .Produces<Post>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+        group.MapGet("/", GetAllPosts)
+            .Produces<List<Post>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+        group.MapPost("/", CreatePost)
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
     }
 
-    [HttpGet]
-    public async Task<IResult> GetAll(
+    private async Task<IResult> GetPostById(
+        Guid id,
+        CancellationToken cancellationToken,
+        ISender sender)
+    {
+        try
+        {
+            var post = await sender.Send(new GetPostByIdQuery(id), cancellationToken);
+            return Results.Ok(post);
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
+
+    private async Task<IResult> GetAllPosts(
         [FromQuery] int take,
         [FromQuery] int skip,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        ISender sender)
     {
-        var posts = await sender
-            .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
-            .ToListAsync(cancellationToken);
-
-        return Results.Ok(new GetAllPostsResponse(posts));
+        try
+        {
+            var posts = await sender
+                .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
+                .ToListAsync(cancellationToken);
+            return Results.Ok(new GetAllPostsResponse(posts));
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
     }
 
-    [HttpPost]
     [Authorization(Permissions.CanPublish)]
-    public async Task<IResult> Create(
+    private async Task<IResult> CreatePost(
+        HttpContext context,
         CreatePostRequest request,
-        CancellationToken cancellationToken
-        )
+        CancellationToken cancellationToken,
+        ISender sender)
     {
-        var userId = (HttpContext.Items["UserId"] as Guid?)!.Value;
-        
-        await sender.Send(new CreatePostCommand(request.Content, request.ParentId, userId), cancellationToken);
+        try
+        {
+            var userId = (context.Items["UserId"] as Guid?)!.Value;
+            await sender.Send(new CreatePostCommand(request.Content, request.ParentId, userId), cancellationToken);
+            return Results.Ok();
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
 
-        return Results.Ok();
+    private IResult HandleException(Exception exception)
+    {
+        return exception switch
+        {
+            PostNotFoundException => Results.NotFound(),
+            ProfileNotFoundException => Results.Problem(statusCode: StatusCodes.Status500InternalServerError),
+            _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
+        };
     }
 }

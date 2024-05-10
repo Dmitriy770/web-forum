@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddWebForumAuth(builder.Configuration);
 builder.Services.AddWebForumCore();
+builder.Services.AddCors();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,8 +34,12 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.SameAsRequest
 });
 
-app.MapGroup(String.Empty)
-    .AddEndpointFilter<AuthorizationFilter>()
-    .MapControllers();
+app.MapWebForumAuthApi();
+app.MapWebForumCoreApi();
 
 await app.RunAsync();
+
+// https://nextui.org/docs/components/badge
+
+// https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-fetch
+// https://github.com/drwpow/openapi-typescript/tree/main
