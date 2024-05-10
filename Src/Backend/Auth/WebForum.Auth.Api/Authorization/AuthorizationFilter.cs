@@ -19,12 +19,16 @@ public class AuthorizationFilter(
             context.HttpContext.Request.Cookies.TryGetValue("some-cookies", out var accessToken);
             if (accessToken is null)
             {
+                Console.WriteLine("token is null");
                 return Results.Unauthorized();
             }
+            
+            Console.WriteLine(accessToken);
 
             var user = await sender.Send(new GetUserByAccessTokenQuery(accessToken));
             if (user is null)
             {
+                Console.WriteLine("user is null");
                 return Results.Unauthorized();
             }
             context.HttpContext.Items.Add("UserId", user.Id);

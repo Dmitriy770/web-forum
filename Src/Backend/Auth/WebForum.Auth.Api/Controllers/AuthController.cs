@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Security.Authentication;
+using MediatR;
 using WebForum.Auth.Api.Authorization;
 using WebForum.Auth.Api.Requests;
 using WebForum.Auth.Api.Responses;
@@ -12,7 +13,7 @@ public sealed class AuthController
     {
         var group = app.MapGroup("/api/auth/access-token")
             .AddEndpointFilter<AuthorizationFilter>();
-        
+
         group.MapPost("/", GetAccessToken)
             .Produces<GetAccessTokenResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
@@ -29,23 +30,53 @@ public sealed class AuthController
         ISender sender
     )
     {
-        var (token, authInfo) = await sender.Send(
-            new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
-        );
+        try
+        {
+            var (token, authInfo) = await sender.Send(
+                new GetAccessTokenQuery(request.Login, request.Password), cancellationToken
+            );
 
-        context.Response.Cookies.Append("some-cookies", token);
+            var cookieOptions = new CookieOptions
+            {
+                Secure = false,
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                IsEssential = true
+            };
+            context.Response.Cookies.Append("some-cookies", token, cookieOptions);
 
-        return Results.Ok(new GetAccessTokenResponse(
-            authInfo.Id,
-            authInfo.Login,
-            authInfo.Permissions.ToString(),
-            authInfo.ExpiresIn
-        ));
+            return Results.Ok(new GetAccessTokenResponse(
+                authInfo.Id,
+                authInfo.Login,
+                authInfo.Permissions.ToString(),
+                authInfo.ExpiresIn
+            ));
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
     }
 
     private IResult DeleteAccessToken(HttpContext context)
     {
-        context.Response.Cookies.Delete("some-coolies");
-        return Results.Ok();
+        try
+        {
+            context.Response.Cookies.Delete("some-coolies");
+            return Results.Ok();
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
+
+    private IResult HandleException(Exception exception)
+    {
+        return exception switch
+        {
+            InvalidCredentialException => Results.BadRequest(),
+            _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
+        };
     }
 }

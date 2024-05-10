@@ -1,8 +1,29 @@
-﻿<main>
-    <MudAppBar Color="Color.Primary" Fixed="false" Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" />
+﻿@using WebForum.Core.Domain.Models
+@using WebForum.Frontend.HttpClients
+@using WebForum.Frontend.States.AuthState
+@using Fluxor
+@inherits LayoutComponentBase
+@inject ProfileHttpClient ProfileHttpClient
+@inject IState<AuthState> AuthState
+
+<main>
+    <MudAppBar Color="Color.Secondary" Fixed="false" Elevation="0">
+        <MudText Typo="Typo.h5">Rubit</MudText>
+        <MudSpacer/>
+        <MudAvatar Src="@profile.AvatarUri"/>
+        <MudText>@profile.DisplayName</MudText>
+        <LogOutButton/>
     </MudAppBar>
-    
+
+    @Body
 </main>
+
+@code
+{
+    private Profile profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await ProfileHttpClient.Get(AuthState.Value.Info.Id, CancellationToken.None);
+    }
+}

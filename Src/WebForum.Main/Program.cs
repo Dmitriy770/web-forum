@@ -27,12 +27,24 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCookiePolicy(new CookiePolicyOptions
+if (app.Environment.IsDevelopment())
 {
-    MinimumSameSitePolicy = SameSiteMode.Strict,
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.SameAsRequest
-});
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        MinimumSameSitePolicy = SameSiteMode.Strict,
+        HttpOnly = HttpOnlyPolicy.Always,
+        Secure = CookieSecurePolicy.None
+    });
+}
+else
+{
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        MinimumSameSitePolicy = SameSiteMode.Strict,
+        HttpOnly = HttpOnlyPolicy.Always,
+        Secure = CookieSecurePolicy.None
+    });
+}
 
 app.MapWebForumAuthApi();
 app.MapWebForumCoreApi();
