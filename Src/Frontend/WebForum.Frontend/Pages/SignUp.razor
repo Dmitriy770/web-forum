@@ -69,8 +69,10 @@
         isLoading = true;
         
         var userId = await AuthHttpClient.SignUp(signUpForm.Login, signUpForm.Password, CancellationToken.None);
+        
+        var displayName = string.IsNullOrEmpty(signUpForm.DisplayName) ? signUpForm.Login : signUpForm.DisplayName;
         var avatarUri = string.IsNullOrEmpty(signUpForm.AvatarUri) ? null : new Uri(signUpForm.AvatarUri);
-        await ProfileHttpClient.Create(userId, signUpForm.DisplayName, avatarUri, CancellationToken.None);
+        await ProfileHttpClient.Create(userId, displayName, avatarUri, CancellationToken.None);
         
         Navigation.NavigateTo("/login");
 

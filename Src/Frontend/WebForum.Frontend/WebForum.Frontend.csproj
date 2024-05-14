@@ -5,6 +5,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
+        <WasmNativeStrip>false</WasmNativeStrip>
+        <DisableScopedCssBundling>true</DisableScopedCssBundling>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +16,8 @@
         <PackageReference Include="Fluxor" Version="5.9.1" />
         <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
         <PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.1" />
+        <PackageReference Include="Markdig" Version="0.37.0" />
+        <PackageReference Include="Markdig.SyntaxHighlighting" Version="1.1.7" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.4" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
@@ -28,5 +33,14 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Common\Common\Common.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <UpToDateCheckBuilt Include="Styles/source.css" Set="Css" />
+        <UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
+    </ItemGroup>
+
+    <Target Name="Tailwind" BeforeTargets="Build">
+        <Exec Command="npm run css:build -i ./Styles/source.css -o ./wwwroot/css/styles.css --minify"/>
+    </Target>
 
 </Project>

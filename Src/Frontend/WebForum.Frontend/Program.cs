@@ -22,11 +22,11 @@ builder.Services.AddFluxor(options =>
 
 builder.Services.AddHttpClient<AuthHttpClient>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5129");
+    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
 });
 builder.Services.AddHttpClient<ProfileHttpClient>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5129");
+    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
 });
 
 await builder.Build().RunAsync();
