@@ -4,10 +4,6 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-
-        <WasmNativeStrip>false</WasmNativeStrip>
-        <DisableScopedCssBundling>true</DisableScopedCssBundling>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,12 +18,6 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.4" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="MudBlazor" Version="6.19.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
     </ItemGroup>
 
     <ItemGroup>

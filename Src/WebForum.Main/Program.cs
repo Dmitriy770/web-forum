@@ -18,34 +18,24 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors(x => x
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials()
-        .SetIsOriginAllowed(origin => true));
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+    .SetIsOriginAllowed(origin => true));
 
-if (app.Environment.IsDevelopment())
+
+app.UseCookiePolicy(new CookiePolicyOptions
 {
-    app.UseCookiePolicy(new CookiePolicyOptions
-    {
-        MinimumSameSitePolicy = SameSiteMode.Strict,
-        HttpOnly = HttpOnlyPolicy.Always,
-        Secure = CookieSecurePolicy.None
-    });
-}
-else
-{
-    app.UseCookiePolicy(new CookiePolicyOptions
-    {
-        MinimumSameSitePolicy = SameSiteMode.Strict,
-        HttpOnly = HttpOnlyPolicy.Always,
-        Secure = CookieSecurePolicy.None
-    });
-}
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.None
+});
+
 
 app.MapWebForumAuthApi();
 app.MapWebForumCoreApi();

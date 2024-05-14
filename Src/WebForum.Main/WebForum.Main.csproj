@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +18,12 @@
         <ProjectReference Include="..\Backend\Auth\WebForum.Auth.Api\WebForum.Auth.Api.csproj" />
         <ProjectReference Include="..\Backend\Core\WebForum.Core.Api\WebForum.Core.Api.csproj" />
         <ProjectReference Include="..\Frontend\WebForum.Frontend\WebForum.Frontend.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
