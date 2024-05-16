@@ -4,20 +4,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebForum.Frontend</title>
+    <title>Rubit</title>
     <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     
     <link rel="stylesheet" href="css/styles.css" asp-append-version="true">
 </head>
 
-<body>
-    <div id="app">
+<body class="body-background min-h-screen">
+    <div id="app" class="h-full">
         <svg class="loading-progress">
             <circle r="40%" cx="50%" cy="50%" />
             <circle r="40%" cx="50%" cy="50%" />
@@ -31,7 +27,14 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>
+
+<style>
+    .body-background{
+        background-size: 400px;
+        background-image: url("/circuit-board.svg");
+        background-repeat: repeat;
+    }
+</style>

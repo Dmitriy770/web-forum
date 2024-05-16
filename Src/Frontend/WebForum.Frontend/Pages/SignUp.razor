@@ -7,76 +7,97 @@
 @inject ProfileHttpClient ProfileHttpClient
 @inject NavigationManager Navigation
 
-<EditForm Model="@signUpForm"
-          OnValidSubmit="OnSubmit"
-          class="mx-auto d-flex flex-column justify-center"
-          style="height: 80%; width: 400px;">
-    <MudCard>
-        <MudCardContent>
-            <MudTextField Label="Login"
-                          @bind-Value="signUpForm.Login"
-                          For="@(() => signUpForm.Login)"
-                          HelperText="Login"/>
-            <MudTextField Label="Display name"
-                          @bind-Value="signUpForm.DisplayName"
-                          For="@(() => signUpForm.DisplayName)"
-                          HelperText="Default name is login"/>
-            <MudTextField Label="Avatar URI"
-                          @bind-Value="signUpForm.AvatarUri"
-                          For="@(() => signUpForm.AvatarUri)"
-                          HelperText="Avatar uri"/>
-            <MudTextField Label="Password"
-                          @bind-Value="signUpForm.Password"
-                          For="@(() => signUpForm.Password)"
-                          InputType="InputType.Password"
-                          HelperText="Password"/>
-            <MudTextField Label="Repeat password"
-                          @bind-Value="signUpForm.RepeatPassword"
-                          For="@(() => signUpForm.Password)"
-                          InputType="InputType.Password"
-                          HelperText="Repeat password"/>
-        </MudCardContent>
-        <MudCardActions Class="d-flex flex-column align-stretch">
-            <MudButton ButtonType="ButtonType.Submit"
-                       Variant="Variant.Filled"
-                       Size="Size.Large"
-                       Color="Color.Primary"
-                       Disabled="isLoading">
-                @if (isLoading)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                    <MudText Class="ms-2">Processing</MudText>
-                }
-                else
-                {
-                    <MudText>Sign Up</MudText>
-                }
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
-</EditForm>
+<div class="h-screen w-full flex flex-col justify-center items-center">
+    <h1 class="text-4xl mb-6 text-primary font-bold">Registration</h1>
+    <EditForm class="w-[28rem] flex flex-col justify-center items-center gap-2 bg-primary-content rounded-box p-4"
+              Model="Form"
+              OnValidSubmit="OnSubmit"
+              disabled="@isLoading">
+        <DataAnnotationsValidator/>
+        <InputText class="input input-bordered w-full"
+                   type="text"
+                   placeholder="* Login"
+                   @bind-Value="Form.Login"/>
+        <div class="text-left h-6 text-error self-start truncate">
+            <ValidationMessage For="@(() => Form.Login)"/>
+        </div>
+        
+        <InputText class="input input-bordered w-full"
+                   type="text"
+                   placeholder="Display name"
+                   @bind-Value="Form.DisplayName"/>
+        <div class="text-left h-6 text-error self-start truncate">
+            <ValidationMessage For="@(() => Form.DisplayName)"/>
+        </div>
+
+        <InputText class="input input-bordered w-full"
+                   type="uri"
+                   placeholder="Avatar URI"
+                   @bind-Value="Form.AvatarUri"/>
+        <div class="text-left h-6 text-error self-start truncate">
+            <ValidationMessage For="@(() => Form.AvatarUri)"/>
+        </div>
+
+        <InputText class="input input-bordered w-full"
+                   type="password"
+                   placeholder="* Password"
+                   @bind-Value="Form.Password"/>
+        <div class="text-left h-6 text-error self-start truncate">
+            <ValidationMessage For="@(() => Form.Password)"/>
+        </div>
+
+        <InputText class="input input-bordered w-full"
+                   type="password"
+                   placeholder="* Repeat password"
+                   @bind-Value="Form.RepeatPassword"/>
+        <div class="text-left h-6 text-error self-start truncate">
+            <ValidationMessage For="@(() => Form.RepeatPassword)"/>
+        </div>
+
+        <button class="btn btn-primary w-full"
+                type="submit"
+                disabled="@isLoading">
+            @if (!isLoading)
+            {
+                <span>Sign up</span>
+            }
+            else
+            {
+                <span class="loading loading-spinner"></span>
+                <span>loading</span>
+            }
+        </button>
+    </EditForm>
+
+    <a class="link link-primary"
+       @onclick="OnSignInClick">
+        sign in
+    </a>
+</div>
 
 @code {
-    private readonly SignUpForm signUpForm = new();
+    [SupplyParameterFromForm] private SignUpForm Form { get; set; } = new();
+
     private bool isLoading = false;
 
     private async Task OnSubmit(EditContext context)
     {
-        if (!context.Validate())
-        {
-            return;
-        }
         isLoading = true;
-        
-        var userId = await AuthHttpClient.SignUp(signUpForm.Login, signUpForm.Password, CancellationToken.None);
-        
-        var displayName = string.IsNullOrEmpty(signUpForm.DisplayName) ? signUpForm.Login : signUpForm.DisplayName;
-        var avatarUri = string.IsNullOrEmpty(signUpForm.AvatarUri) ? null : new Uri(signUpForm.AvatarUri);
+
+        var userId = await AuthHttpClient.SignUp(Form.Login, Form.Password, CancellationToken.None);
+
+        var displayName = string.IsNullOrEmpty(Form.DisplayName) ? Form.Login : Form.DisplayName;
+        var avatarUri = string.IsNullOrEmpty(Form.AvatarUri) ? null : new Uri(Form.AvatarUri);
         await ProfileHttpClient.Create(userId, displayName, avatarUri, CancellationToken.None);
-        
-        Navigation.NavigateTo("/login");
+
+        Navigation.NavigateTo("/signin");
 
         isLoading = false;
+    }
+
+    private void OnSignInClick()
+    {
+        Navigation.NavigateTo("signin");
     }
 
     private class SignUpForm
@@ -89,16 +110,17 @@
 
         [MinLength(2, ErrorMessage = "Minimum length 2")]
         [MaxLength(12, ErrorMessage = "Maximum length 12")]
-        public string DisplayName { get; set; } = string.Empty;
+        public string? DisplayName { get; set; } = null;
 
         [RegularExpression("(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*[0-9a-zA-Z])*(:(0-9)*)*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&%\\$#_]*)?", ErrorMessage = "Invalid URI")]
-        public string AvatarUri { get; set; } = string.Empty;
+        public string? AvatarUri { get; set; } = null;
 
         [Required]
         [MinLength(10, ErrorMessage = "Minimum length 10")]
         public string Password { get; set; } = string.Empty;
 
         [Required]
+        [MinLength(10, ErrorMessage = "Minimum length 10")]
         [Compare(nameof(Password), ErrorMessage = "Passwords must match")]
         public string RepeatPassword { get; set; } = string.Empty;
     }

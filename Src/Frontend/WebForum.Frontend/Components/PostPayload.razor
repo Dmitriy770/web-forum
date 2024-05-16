@@ -1,24 +1,17 @@
 ﻿@using Markdig
-@using Markdig.SyntaxHighlighting
-@using ColorCode.Compilation.Languages
-@using Markdown = Markdig.Markdown
 
-<div payload>
-    <h1 class="text-">Test</h1>
-    
-    <h2>Test</h2>
-    
+<div payload class="@Class">
     @CreateComponent()
 </div>
 
 @code {
-    [Parameter] public string Content { get; set; }
-    
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string Content { get; set; } = string.Empty;
+
     private MarkupString CreateComponent()
     {
         var pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
-            .UseSyntaxHighlighting()
             .Build();
 
         var content = Markdown.ToHtml(Content, pipeline);

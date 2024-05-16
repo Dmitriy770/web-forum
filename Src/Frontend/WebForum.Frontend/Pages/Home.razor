@@ -4,8 +4,10 @@
 
 <LayoutView Layout="@typeof(HomeLayout)">
     <PageTitle>Home</PageTitle>
-    <h1>Title h1</h1>
-    <PostCard/>
+    <div class="flex flex-col items-stretch gap-2 pt-2 shadow-xl">
+        <PostCard/>
+        <PostCard/>
+    </div>
 </LayoutView>
 
 @code

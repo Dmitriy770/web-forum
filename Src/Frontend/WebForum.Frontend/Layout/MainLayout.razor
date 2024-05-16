@@ -1,9 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
-
-<div class="h-screen p-4 bg-scroll">
+<div>
     @Body
 </div>
+
+<style>
+    .body-background{
+        background-size: 400px;
+        background-image: url("/circuit-board.svg");
+        background-repeat: repeat;
+    }
+</style>

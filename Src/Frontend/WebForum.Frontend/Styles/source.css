@@ -3,9 +3,36 @@
 @tailwind utilities;
 
 div[payload] h1 {
-    @apply text-xl
+    @apply text-2xl
 }
 
 div[payload] h2 {
+    @apply text-xl;
+}
+
+div[payload] h3 {
     @apply text-lg;
+}
+
+div[payload] p {
+    @apply mx-1;
+}
+
+div[payload] ul {
+    @apply list-disc;
+}
+
+div[payload] hr {
+    @apply divider m-1;
+    color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+}
+
+div[payload] pre {
+    @apply rounded-box bg-base-200 shadow p-4 mx-2;
+}
+
+div[payload] a {
+    @apply link
 }

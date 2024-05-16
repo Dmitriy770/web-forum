@@ -7,21 +7,17 @@
 @inject IState<AuthState> AuthState
 @inject IDispatcher Dispatcher
 
-<MudButton @onclick="OnClick"
-           Variant="Variant.Filled"
-           Size="Size.Large"
-           Color="Color.Primary"
-           Disabled="AuthState.Value.IsLoading">
+<button @onclick="OnClick"
+        disabled="@AuthState.Value.IsLoading">
     @if (AuthState.Value.IsLoading)
     {
-        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-        <MudText Class="ms-2">Processing</MudText>
+        <p Class="ms-2">Processing</p>
     }
     else
     {
-        <MudText>Log out</MudText>
+        <p>Log out</p>
     }
-</MudButton>
+</button>
 
 @code {
 

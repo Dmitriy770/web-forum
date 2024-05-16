@@ -2,7 +2,6 @@ using Blazored.LocalStorage;
 using Fluxor;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MudBlazor.Services;
 using WebForum.Frontend;
 using WebForum.Frontend.HttpClients;
 
@@ -11,7 +10,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 Console.WriteLine(builder.HostEnvironment.BaseAddress);
-builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddFluxor(options =>

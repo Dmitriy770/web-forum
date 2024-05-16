@@ -9,54 +9,44 @@
 @inject IDispatcher Dispatcher
 @inject NavigationManager Navigation
 
-<EditForm Model="@signInForm"
-          OnValidSubmit="OnSubmit"
-          class="mx-auto d-flex flex-column justify-center align-stretch"
-          style="height: 90vh; width: 400px;">
-    <MudCard>
-        <MudCardContent>
-            <MudTextField Label="Login"
-                          Variant="Variant.Outlined"
-                          @bind-Value="signInForm.Login"
-                          Class="pb-4"/>
-            <MudTextField Label="Password"
-                          Variant="Variant.Outlined"
-                          @bind-Value="signInForm.Password"
-                          InputType="InputType.Password"
-                          Class="pb-4"/>
-            <MudText Color="Color.Error"
-                     Style="min-height: 30px">
-                @AuthState.Value.Error
-            </MudText>
-        </MudCardContent>
-        <MudCardActions Class="d-flex flex-column align-stretch">
-            <MudButton ButtonType="ButtonType.Submit"
-                       Variant="Variant.Filled"
-                       Size="Size.Large"
-                       Color="Color.Primary"
-                       Disabled="AuthState.Value.IsLoading">
-                @if (AuthState.Value.IsLoading)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                    <MudText Class="ms-2">Processing</MudText>
-                }
-                else
-                {
-                    <MudText>Sign In</MudText>
-                }
-            </MudButton>
-        </MudCardActions>
-    </MudCard>
-    
-    <MudLink OnClick="OnSignUpClick"
-             Class="mt-8 align-self-center"
-             >Sign up</MudLink>
-</EditForm>
+<div class="w-full h-screen flex flex-col justify-center items-center gap-2 pb-48">
+    <h1 class="text-6xl font-bold text-primary my-8">Rubit</h1>
+    <form class="flex flex-col justify-center items-center bg-primary-content rounded-box gap-3 p-3 w-96"
+          @onsubmit="OnSubmit"
+          @onsubmit:preventDefault="true"
+          disabled="@AuthState.Value.IsLoading">
+        <input class="input input-bordered w-full"
+               type="text"
+               placeholder="Login"
+               @bind="signInForm.Login"/>
+        <input class="input input-bordered w-full"
+               type="password"
+               placeholder="Password"
+               @bind="signInForm.Password"/>
+        <button class="btn btn-primary w-full"
+                type="submit"
+                disabled="@AuthState.Value.IsLoading">
+            @if (!AuthState.Value.IsLoading)
+            {
+                <span>Sign in</span>
+            }
+            else
+            {
+                <span class="loading loading-spinner"></span>
+                <span>loading</span>
+            }
+        </button>
+    </form>
+    <a class="link link-primary"
+       @onclick="OnSignUpClick">
+        sign up
+    </a>
+</div>
 
 @code {
-    private readonly SignInForm signInForm = new SignInForm();
+    private readonly SignInForm signInForm = new();
 
-    private void OnSubmit()
+    private void OnSubmit(EventArgs args)
     {
         Dispatcher.Dispatch(new AuthLogInStartAction(signInForm.Login, signInForm.Password));
 
@@ -67,10 +57,11 @@
     {
         Navigation.NavigateTo("/signup");
     }
-    
+
     private class SignInForm
     {
         public string Login { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
+
 }
