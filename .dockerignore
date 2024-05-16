@@ -1,0 +1,6 @@
+﻿**/.idea
+**/obj
+**/bin
+**/.vs
+**/node_modules
+**/css/styles.css

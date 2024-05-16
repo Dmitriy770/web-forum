@@ -4,6 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+
+        <RunAOTCompilation>false</RunAOTCompilation>
+        <RunAOTCompilationAfterBuild>false</RunAOTCompilationAfterBuild>
+        <WasmStripILAfterAOT>false</WasmStripILAfterAOT>
+        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
+        <WasmNativeStrip>false</WasmNativeStrip>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,7 +36,7 @@
     </ItemGroup>
 
     <Target Name="Tailwind" BeforeTargets="Build">
-        <Exec Command="npm run css:build -i ./Styles/source.css -o ./wwwroot/css/styles.css --minify"/>
+        <Exec Command="npm run css:build"/>
     </Target>
 
 </Project>
