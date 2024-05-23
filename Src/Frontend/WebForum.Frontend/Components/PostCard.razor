@@ -1,8 +1,9 @@
 ﻿@using Markdig
+@using WebForum.Frontend.Models
 
-<div class="bg-base-100 rounded-box p-2 bg-primary-content">
+<div class="rounded-box p-2 bg-primary-content">
     
-    <PostPayload Class="p-4" Content="@text"/>
+    <PostPayload Class="p-4" Content="@Post.Content"/>
 
     <div class="divider m-1"></div>
 
@@ -11,16 +12,16 @@
             <div class="btn btn-ghost px-1">
                 <div class="avatar">
                     <div class="w-10 rounded-full mask mask-circle">
-                        <img alt="avatar" src="/avatar.jpg"/>
+                        <img alt="avatar" src="@Post.Profile.AvatarUri"/>
                     </div>
                 </div>
 
                 <div class="flex flex-col justify-around items-start">
                     <span class="text-lg">
-                        user name
+                        @Post.Profile.DisplayName
                     </span>
                     <span class="text-sm">
-                        Сегодня
+                        @Post.CreationDate
                     </span>
                 </div>
             </div>
@@ -49,40 +50,5 @@
 </div>
 
 @code {
-    protected string text;
-
-    protected override void OnInitialized()
-    {
-        text = @"
-__Advertisement :)__
-
-- __[pica](https://nodeca.github.io/pica/demo/)__ - high quality and fast image
-resize in browser.
-- __[babelfish](https://github.com/nodeca/babelfish/)__ - developer friendly
-i18n with plurals support and easy syntax.
-
-You will like those projects!
-
-# h1 Heading 8-)
-
-## Lists
-
-
-Block code ""fences""
-
-```
-Sample text here...
-```
-
-Syntax highlighting
-
-```js
-var foo = function (bar) {
-return bar++;
-};
-
-console.log(foo(5));
-```";
-    }
-
+    [Parameter] public Post Post {get; set; }
 }

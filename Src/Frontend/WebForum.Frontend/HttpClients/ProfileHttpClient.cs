@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using WebForum.Core.Domain.Models;
 using WebForum.Frontend.HttpClients.Requests;
 using WebForum.Frontend.HttpClients.Responses;
 
@@ -27,18 +26,11 @@ public class ProfileHttpClient(
             $"api/core/profile/{userId}",
             cancellationToken);
         
-        Console.WriteLine(response.StatusCode);
-        Console.WriteLine(await response.Content.ReadAsStringAsync(cancellationToken));
-        
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
                 var profile = (await response.Content.ReadFromJsonAsync<Profile>(cancellationToken))!;
-                if (profile.AvatarUri is null)
-                {
-                    return (profile with { AvatarUri = _defaultAvatar }, null);
-                }
-                return (profile, null);
+                return (profile with {AvatarUri = profile.AvatarUri ?? _defaultAvatar}, null);
             
             default:
                 var error = await response.Content.ReadFromJsonAsync<Error>(cancellationToken);

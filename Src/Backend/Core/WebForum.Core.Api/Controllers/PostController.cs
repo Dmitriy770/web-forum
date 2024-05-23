@@ -55,14 +55,27 @@ public class PostController
     private async Task<IResult> GetAllPosts(
         [FromQuery] int take,
         [FromQuery] int skip,
+        [FromQuery] Guid? parentId,
         CancellationToken cancellationToken,
         ISender sender)
     {
         try
         {
-            var posts = await sender
-                .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
-                .ToListAsync(cancellationToken);
+            List<Post> posts;
+
+            if (parentId is null)
+            {
+                posts = await sender
+                    .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                posts = await sender
+                    .CreateStream(new GetPostsByParentId(parentId.Value, take, skip), cancellationToken)
+                    .ToListAsync(cancellationToken);
+            }
+
             return Results.Ok(new GetAllPostsResponse(posts));
         }
         catch (Exception exception)

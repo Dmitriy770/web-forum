@@ -1,5 +1,5 @@
-﻿@using WebForum.Core.Domain.Models
-@using WebForum.Frontend.HttpClients
+﻿@using WebForum.Frontend.HttpClients
+@using WebForum.Frontend.HttpClients.Responses
 @using WebForum.Frontend.Services.Interfaces
 @inherits LayoutComponentBase
 
@@ -62,6 +62,8 @@
             return;
         }
 
+        Console.WriteLine(profile);
+        
         _profile = profile;
     }
 

@@ -18,8 +18,13 @@ public sealed class FakePostRepository : IPostRepository
         return Task.FromResult(Posts.FirstOrDefault(post => post.Id == id));
     }
 
+    public IAsyncEnumerable<Post> FindByParentId(Guid parentId, int take, int skip, CancellationToken cancellationToken)
+    {
+        return Posts.Where(post => post.ParentId == parentId).Skip(skip).Take(take).ToAsyncEnumerable();
+    }
+
     public IAsyncEnumerable<Post> GetAll(int take, int skip, CancellationToken cancellationToken)
     {
-        return Posts.Skip(skip).Take(take).ToAsyncEnumerable();
+        return Posts.Where(post => post.ParentId is null).Skip(skip).Take(take).ToAsyncEnumerable();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace WebForum.Core.Domain.Models;
+﻿namespace WebForum.Frontend.HttpClients.Responses;
 
 public record Profile
 {

@@ -28,8 +28,6 @@ COPY ["Src/Backend/Auth/WebForum.Auth.Infrastructure/WebForum.Auth.Infrastructur
 COPY ["Src/Backend/Auth/WebForum.Auth.Application/WebForum.Auth.Application.csproj", "Src/Backend/Auth/WebForum.Auth.Application/"]
 COPY ["Src/Backend/Auth/WebForum.Auth.Domain/WebForum.Auth.Domain.csproj", "Src/Backend/Auth/WebForum.Auth.Domain/"]
 
-COPY ["Src/Common/Common/Common.csproj", "Src/Common/Common/"]
-
 COPY ["Src/Backend/Core/WebForum.Core.Api/WebForum.Core.Api.csproj", "Src/Backend/Core/WebForum.Core.Api/"]
 COPY ["Src/Backend/Core/WebForum.Core.Application/WebForum.Core.Application.csproj", "Src/Backend/Core/WebForum.Core.Application/"]
 COPY ["Src/Backend/Core/WebForum.Core.Domain/WebForum.Core.Domain.csproj", "Src/Backend/Core/WebForum.Core.Domain/"]

@@ -1,17 +1,27 @@
 ﻿@page "/"
+@using WebForum.Frontend.HttpClients
 
 @inject NavigationManager Navigation
+@inject PostHttpClient PostHttpClient
 
 <LayoutView Layout="@typeof(HomeLayout)">
     <PageTitle>Home</PageTitle>
     <div class="flex flex-col items-stretch gap-2 pt-2 shadow-xl">
-        <PostCard/>
-        <PostCard/>
-        <PostCard/>
-  
+        
+        @foreach (var post in _posts)
+        {
+            <PostCard Post="post"/>
+        }
     </div>
 </LayoutView>
 
 @code
 {
+    private List<Models.Post> _posts = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var (posts, error) = await PostHttpClient.GetAll(0, 100, default);
+        _posts = posts.ToList();
+    }
 }
