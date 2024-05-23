@@ -1,15 +1,16 @@
 ﻿@using WebForum.Core.Domain.Models
 @using WebForum.Frontend.HttpClients
-@using WebForum.Frontend.States.AuthState
-@using Fluxor
+@using WebForum.Frontend.Services.Interfaces
 @inherits LayoutComponentBase
+
+@inject IAuthService AuthService
 @inject ProfileHttpClient ProfileHttpClient
-@inject IState<AuthState> AuthState
+@inject NavigationManager Navigation
 
 <div class="max-w-screen-lg mx-auto pt-2">
     <div class="navbar bg-primary-content rounded-box shadow-xl">
         <div class="flex-1">
-            <a class="btn btn-ghost text-2xl">Rubit</a>
+            <a class="btn btn-ghost text-2xl" @onclick="OnLogoClick">Rubit</a>
         </div>
 
 
@@ -17,16 +18,16 @@
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
-                        <img alt="avatar" src="@avatarUrl"/>
+                        <img alt="avatar" src="@_profile?.AvatarUri?.ToString()"/>
                     </div>
                 </div>
 
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-32">
                     <li>
-                        <a>Profile</a>
+                        <a @onclick="OnProfileClick">Profile</a>
                     </li>
                     <li>
-                        <a>Logout</a>
+                        <a @onclick="OnLogoutClick">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -40,15 +41,43 @@
 
 @code
 {
-    private Profile profile;
-    private string avatarUrl;
+    private Profile? _profile;
 
     protected override async Task OnInitializedAsync()
     {
-        profile = await ProfileHttpClient.Get(AuthState.Value.Info.Id, CancellationToken.None);
-        Console.WriteLine(profile);
+        var authInfo = await AuthService.GetInfo(default);
+        if (authInfo is null)
+        {
+            await AuthService.Logout(default);
+            Navigation.NavigateTo("/signin");
+            return;
+        }
 
-        avatarUrl = profile.AvatarUri is null ? "/avatar.jpg" : profile.AvatarUri.ToString();
-        Console.WriteLine($"avatar next {avatarUrl}");
+        var (profile, error) = await ProfileHttpClient.Get(authInfo.Id, default);
+        Console.WriteLine(profile);
+        if (profile is null)
+        {
+            await AuthService.Logout(default);
+            Navigation.NavigateTo("/signin");
+            return;
+        }
+
+        _profile = profile;
+    }
+
+    private void OnLogoClick()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private async Task OnLogoutClick()
+    {
+        await AuthService.Logout(default);
+        Navigation.NavigateTo("/signin");
+    }
+
+    private void OnProfileClick()
+    {
+        Navigation.NavigateTo($"/profile/{_profile.UserId}");
     }
 }

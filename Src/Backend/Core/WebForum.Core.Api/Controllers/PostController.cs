@@ -94,7 +94,7 @@ public class PostController
     {
         return exception switch
         {
-            PostNotFoundException => Results.NotFound(),
+            PostNotFoundException => Results.StatusCode(statusCode: StatusCodes.Status404NotFound),
             ProfileNotFoundException => Results.Problem(statusCode: StatusCodes.Status500InternalServerError),
             _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };

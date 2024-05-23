@@ -1,5 +1,4 @@
-﻿using Common.Guards;
-using MediatR;
+﻿using MediatR;
 using WebForum.Auth.Application.Interfaces;
 using WebForum.Auth.Domain.Exceptions;
 using WebForum.Auth.Domain.Models;

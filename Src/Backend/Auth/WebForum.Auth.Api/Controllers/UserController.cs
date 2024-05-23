@@ -62,8 +62,8 @@ public sealed class UserController
     {
         return exception switch
         {
-            UserAlreadyExistsException => Results.Conflict(),
-            UserNotFoundException => Results.NotFound(),
+            UserAlreadyExistsException => Results.Problem(statusCode: StatusCodes.Status409Conflict),
+            UserNotFoundException => Results.Problem(statusCode: StatusCodes.Status404NotFound),
             _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };
     }

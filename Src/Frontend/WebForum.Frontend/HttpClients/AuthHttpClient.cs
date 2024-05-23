@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using Common.Nullable;
-using FluentResults;
 using WebForum.Frontend.HttpClients.Responses;
 using WebForum.Frontend.Models;
 
@@ -11,36 +9,33 @@ public class AuthHttpClient(
     HttpClient http
 )
 {
-    public async Task<Result<AuthInfo>> SignIn(string login, string password, CancellationToken cancellationToken)
+    public async Task<(AuthInfo?, Error?)> Login(string login, string password, CancellationToken cancellationToken)
     {
         var response = await http.PostAsJsonAsync(
             "/api/auth/access-token",
             new { login, password },
             cancellationToken);
 
-        switch (response.StatusCode)
-        {
-            case HttpStatusCode.OK:
-                var authInfo = await response.Content.ReadFromJsonAsync<AuthInfo>(cancellationToken);
-                return authInfo.Match(
-                    Result.Ok,
-                    () => Result.Fail("unexpected error")
-                );
-            case HttpStatusCode.BadRequest:
-                return Result.Fail("invalid password or login");
-            default:
-                return Result.Fail("unexpected error");
-        }
+        return response.StatusCode switch {
+            HttpStatusCode.OK => (await response.Content.ReadFromJsonAsync<AuthInfo>(cancellationToken), null),
+            _ => (null, await response.Content.ReadFromJsonAsync<Error>(cancellationToken))
+        };
     }
 
-    public async Task SignOut(CancellationToken cancellationToken)
+    public async Task<Error?> Logout(CancellationToken cancellationToken)
     {
-        await http.DeleteAsync(
+        var response = await http.DeleteAsync(
             "/api/auth/access-token",
             cancellationToken);
+
+        return response.StatusCode switch
+        {
+            HttpStatusCode.OK => null,
+            _ => await response.Content.ReadFromJsonAsync<Error>(cancellationToken)
+        };
     }
 
-    public async Task<Guid> SignUp(string login, string password, CancellationToken cancellationToken)
+    public async Task<Guid> Registration(string login, string password, CancellationToken cancellationToken)
     {
         var response = await http.PostAsJsonAsync(
             "/api/auth/user",

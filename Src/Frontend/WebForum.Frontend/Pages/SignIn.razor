@@ -1,12 +1,7 @@
 ﻿@page "/signin"
-@using Fluxor
-@using WebForum.Frontend.States.AuthState
-@using WebForum.Frontend.States.AuthState.Actions
+@using WebForum.Frontend.Services.Interfaces
 
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-
-@inject IState<AuthState> AuthState
-@inject IDispatcher Dispatcher
+@inject IAuthService AuthService
 @inject NavigationManager Navigation
 
 <div class="w-full h-screen flex flex-col justify-center items-center gap-2 pb-48">
@@ -14,19 +9,19 @@
     <form class="flex flex-col justify-center items-center bg-primary-content rounded-box gap-3 p-3 w-96"
           @onsubmit="OnSubmit"
           @onsubmit:preventDefault="true"
-          disabled="@AuthState.Value.IsLoading">
+          disabled="@_isLoading">
         <input class="input input-bordered w-full"
                type="text"
                placeholder="Login"
-               @bind="signInForm.Login"/>
+               @bind="_form.Login"/>
         <input class="input input-bordered w-full"
                type="password"
                placeholder="Password"
-               @bind="signInForm.Password"/>
+               @bind="_form.Password"/>
         <button class="btn btn-primary w-full"
                 type="submit"
-                disabled="@AuthState.Value.IsLoading">
-            @if (!AuthState.Value.IsLoading)
+                disabled="@_isLoading">
+            @if (!_isLoading)
             {
                 <span>Sign in</span>
             }
@@ -44,13 +39,21 @@
 </div>
 
 @code {
-    private readonly SignInForm signInForm = new();
+    private readonly SignInForm _form = new();
+    private bool _isLoading = false;
 
-    private void OnSubmit(EventArgs args)
+    private async Task OnSubmit(EventArgs args)
     {
-        Dispatcher.Dispatch(new AuthLogInStartAction(signInForm.Login, signInForm.Password));
-
-        StateHasChanged();
+        _isLoading = true;
+        var error = await AuthService.Login(_form.Login, _form.Password, default);
+        _isLoading = false;
+        if (error is not null)
+        {
+            _form.Password = string.Empty;
+            return;
+        }
+        
+        Navigation.NavigateTo("/");
     }
 
     private void OnSignUpClick()

@@ -1,9 +1,5 @@
-﻿@using Fluxor
-@using WebForum.Frontend.States.AuthState
-
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-
-@inject IState<AuthState> AuthState
+﻿@using WebForum.Frontend.Services.Interfaces
+@inject IAuthService AuthService
 @inject NavigationManager Navigation
 
 <Fluxor.Blazor.Web.StoreInitializer/>
@@ -24,22 +20,19 @@
 
 @code{
 
-    private readonly string[] noAuthPages = { "signin", "signup" };
+    private readonly string[] _noAuthPages = ["signin", "signup"];
 
-    private Task OnNavigateAsync(NavigationContext context)
+    private async Task OnNavigateAsync(NavigationContext context)
     {
-        Console.WriteLine(context.Path);
-        if (IsAuthNeed(context.Path) && !AuthState.Value.IsLogInEnd())
+        if (IsAuthNeed(context.Path) && !await AuthService.IsLogin(default))
         {
             Navigation.NavigateTo("signin");
         }
-
-        return Task.CompletedTask;
     }
 
     private bool IsAuthNeed(string path)
     {
-        foreach (var noAuthPage in noAuthPages)
+        foreach (var noAuthPage in _noAuthPages)
         {
             if (string.Compare(path, noAuthPage, StringComparison.Ordinal) == 0)
             {

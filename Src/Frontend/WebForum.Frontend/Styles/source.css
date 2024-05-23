@@ -20,6 +20,7 @@ div[payload] p {
 
 div[payload] ul {
     @apply list-disc;
+    @apply ms-10;
 }
 
 div[payload] hr {

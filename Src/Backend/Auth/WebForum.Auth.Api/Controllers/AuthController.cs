@@ -75,7 +75,7 @@ public sealed class AuthController
     {
         return exception switch
         {
-            InvalidCredentialException => Results.BadRequest(),
+            InvalidCredentialException => Results.Problem(statusCode: StatusCodes.Status400BadRequest),
             _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };
     }

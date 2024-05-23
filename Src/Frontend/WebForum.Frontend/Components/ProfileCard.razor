@@ -1,0 +1,27 @@
+﻿@using WebForum.Frontend.HttpClients
+@using Profile = WebForum.Core.Domain.Models.Profile
+@inject ProfileHttpClient ProfileHttpClient
+
+<div class="bg-primary-content rounded-box flex flex-row shadow-xl p-2 items-center gap-2">
+    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+        <div class="w-10 rounded-full">
+            <img alt="avatar" src="@_profile?.AvatarUri?.ToString()"/>
+        </div>
+    </div>
+    <div>
+        @_profile?.DisplayName
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
+
+    private Profile? _profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var (profile, error) = await ProfileHttpClient.Get(UserId, default);
+        _profile = profile;
+    }
+
+}

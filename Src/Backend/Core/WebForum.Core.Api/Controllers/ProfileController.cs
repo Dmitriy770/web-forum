@@ -68,8 +68,8 @@ public sealed class ProfileController
     {
         return exception switch
         {
-            ProfileNotFoundException => Results.NotFound(),
-            ProfileAlreadyExistsException => Results.Conflict(),
+            ProfileNotFoundException => Results.Problem(statusCode: StatusCodes.Status404NotFound),
+            ProfileAlreadyExistsException => Results.Problem(statusCode: StatusCodes.Status409Conflict),
             _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };
     }
