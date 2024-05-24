@@ -23,6 +23,11 @@ div[payload] ul {
     @apply ms-10;
 }
 
+div[payload] ol {
+    @apply list-decimal;
+    @apply ms-10;
+}
+
 div[payload] hr {
     @apply divider m-1;
     color: rgba(0, 0, 0, 0);
@@ -36,4 +41,12 @@ div[payload] pre {
 
 div[payload] a {
     @apply link
+}
+
+div[payload] b {
+    @apply font-bold;
+}
+
+div[payload] i {
+    @apply italic;
 }

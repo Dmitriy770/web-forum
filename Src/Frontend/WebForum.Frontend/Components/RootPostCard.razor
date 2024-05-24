@@ -1,0 +1,79 @@
+﻿@using WebForum.Frontend.Models
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
+
+<div class="rounded-box p-2 bg-primary-content">
+
+    <PostPayload Class="p-4" Content="@Post.Content"/>
+
+    <div class="divider m-1"></div>
+
+    <div class="flex flex-row align-middle gap-2">
+        <div class="flex-1">
+            <div class="btn btn-ghost px-1">
+                <div class="avatar">
+                    <div class="w-10 rounded-full mask mask-circle">
+                        <img alt="avatar" src="@Post.Profile.AvatarUri"/>
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-around items-start">
+                    <span class="text-lg">
+                        @Post.Profile.DisplayName
+                    </span>
+                    <span class="text-sm">
+                        @Post.CreationDate
+                    </span>
+                </div>
+            </div>
+        </div>
+
+
+        <button @onclick="OnShareClick" class="flex-none btn btn-ghost btn-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"/>
+            </svg>
+        </button>
+
+        <button @onclick="OnMoreClick" class="btn btn-primary flex-none">
+            More
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+            </svg>
+
+        </button>
+    </div>
+
+    @if (_isToastVisible)
+    {
+        <div class="toast toast-center toast-bottom">
+            <div class="alert alert-info gap-0">
+                Copy to clipboard!
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public Post Post { get; set; }
+
+    private bool _isToastVisible = false;
+
+    private void OnMoreClick()
+    {
+        Navigation.NavigateTo($"/thread/{Post.Id}");
+    }
+
+    private async Task OnShareClick()
+    {
+        _isToastVisible = true;
+        
+        var url = Navigation.ToAbsoluteUri($"/thread/{Post.Id}").ToString();
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
+
+        await Task.Delay(TimeSpan.FromSeconds(0.5));
+        _isToastVisible = false;
+    }
+
+}

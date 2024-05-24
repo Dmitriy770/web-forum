@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using WebForum.Frontend.HttpClients.Requests;
 using WebForum.Frontend.HttpClients.Responses;
@@ -37,9 +36,20 @@ public class PostHttpClient(
         };
     }
 
+    public async Task<(Post?, Error?)> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.GetAsync($"api/post/{id}", cancellationToken);
+
+        return response.StatusCode switch
+        {
+            HttpStatusCode.OK => (PreparePost(await response.Content.ReadFromJsonAsync<Post>(cancellationToken)), null),
+            _ => (null, await response.Content.ReadFromJsonAsync<Error>(cancellationToken))
+        };
+    }
+    
     public async Task<(IEnumerable<Post>, Error?)> GetByParentId(Guid parentId, int skip, int take, CancellationToken cancellationToken)
     {
-        var response = await httpClient.GetAsync($"api/post?take={take}&skip={skip}$parentId={parentId}", cancellationToken);
+        var response = await httpClient.GetAsync($"api/post?take={take}&skip={skip}&parentId={parentId}", cancellationToken);
         
         return response.StatusCode switch {
             HttpStatusCode.OK => (PreparePosts(await response.Content.ReadFromJsonAsync<GetAllPostsResponse>(cancellationToken)), null),
@@ -49,9 +59,11 @@ public class PostHttpClient(
 
     private IEnumerable<Post> PreparePosts(GetAllPostsResponse response)
     {
-        return response.Posts.Select(post => post with
-        {
-            Profile = post.Profile with { AvatarUri =  post.Profile.AvatarUri ?? _defaultAvatar}
-        });
+        return response.Posts.Select(PreparePost);
+    }
+
+    private Post PreparePost(Post post)
+    {
+        return post with { Profile = post.Profile with {AvatarUri = post.Profile.AvatarUri ?? _defaultAvatar }};
     }
 }
