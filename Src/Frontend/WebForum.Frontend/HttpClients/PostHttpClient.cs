@@ -56,6 +56,16 @@ public class PostHttpClient(
             _ => (new List<Post>(), await response.Content.ReadFromJsonAsync<Error>(cancellationToken))
         };
     }
+    
+    public async Task<(IEnumerable<Post>, Error?)> GetByUserId(Guid userId, int skip, int take, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.GetAsync($"api/post?take={take}&skip={skip}&userId={userId}", cancellationToken);
+        
+        return response.StatusCode switch {
+            HttpStatusCode.OK => (PreparePosts(await response.Content.ReadFromJsonAsync<GetAllPostsResponse>(cancellationToken)), null),
+            _ => (new List<Post>(), await response.Content.ReadFromJsonAsync<Error>(cancellationToken))
+        };
+    }
 
     private IEnumerable<Post> PreparePosts(GetAllPostsResponse response)
     {

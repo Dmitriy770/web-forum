@@ -1,13 +1,39 @@
 ﻿@page "/profile/{Id:guid}"
 
+@using WebForum.Frontend.Models
+@using WebForum.Frontend.HttpClients
+@using WebForum.Frontend.Services.Interfaces
+@inject IAuthService AuthService
+@inject PostHttpClient PostHttpClient
+
 <LayoutView Layout="@typeof(HomeLayout)">
     <PageTitle>Profile</PageTitle>
     <div class="flex flex-col items-stretch gap-2 pt-2">
         <ProfileCard UserId="Id"/>
-        <CreatePost/>
+        @if (Id == _currentUserId)
+        {
+            <CreatePost/>
+        }
+        @foreach (var post in _posts)
+        {
+            <RootPostCard @key="post.Id" Post="post"/>
+        }
     </div>
 </LayoutView>
 
 @code {
     [Parameter] public Guid Id { get; set; }
+
+    private Guid _currentUserId = Guid.Empty;
+    private List<Post> _posts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authInfo = await AuthService.GetInfo(default);
+        _currentUserId = authInfo!.Id;
+
+        var (posts, error) = await PostHttpClient.GetByUserId(Id, 0, 100, default);
+        _posts = posts.ToList();
+    }
+
 }

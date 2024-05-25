@@ -14,7 +14,7 @@
         <CreatePost ParentId="Id"/>
         @foreach (var post in _posts)
         {
-            <RootPostCard Post="post"/>
+            <PostCard Post="post"/>
         }
     </div>
 </LayoutView>
@@ -30,9 +30,8 @@
         
         var (rootPost, error) = await PostHttpClient.GetById(Id, default);
         _rootPost = rootPost!;
-
+    
         var (posts, postsError) = await PostHttpClient.GetByParentId(Id, 0, 100, default);
         _posts = posts.ToList();
     }
-
 }

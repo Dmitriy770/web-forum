@@ -56,6 +56,7 @@ public class PostController
         [FromQuery] int take,
         [FromQuery] int skip,
         [FromQuery] Guid? parentId,
+        [FromQuery] Guid? userId,
         CancellationToken cancellationToken,
         ISender sender)
     {
@@ -63,16 +64,22 @@ public class PostController
         {
             List<Post> posts;
 
-            if (parentId is null)
+            if (parentId is not null)
             {
                 posts = await sender
-                    .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
+                    .CreateStream(new GetPostsByParentId(parentId.Value, take, skip), cancellationToken)
+                    .ToListAsync(cancellationToken);
+            }
+            else if(userId is not null)
+            {
+                posts = await sender
+                    .CreateStream(new GetPostsByUserId(userId.Value, take, skip), cancellationToken)
                     .ToListAsync(cancellationToken);
             }
             else
             {
                 posts = await sender
-                    .CreateStream(new GetPostsByParentId(parentId.Value, take, skip), cancellationToken)
+                    .CreateStream(new GetAllPostsQuery(take, skip), cancellationToken)
                     .ToListAsync(cancellationToken);
             }
 

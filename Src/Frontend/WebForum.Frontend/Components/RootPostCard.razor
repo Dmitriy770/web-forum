@@ -10,7 +10,7 @@
 
     <div class="flex flex-row align-middle gap-2">
         <div class="flex-1">
-            <div class="btn btn-ghost px-1">
+            <button @onclick="OnProfileClick" class="btn btn-ghost px-1">
                 <div class="avatar">
                     <div class="w-10 rounded-full mask mask-circle">
                         <img alt="avatar" src="@Post.Profile.AvatarUri"/>
@@ -25,7 +25,7 @@
                         @Post.CreationDate
                     </span>
                 </div>
-            </div>
+            </button>
         </div>
 
 
@@ -62,18 +62,31 @@
 
     private void OnMoreClick()
     {
-        Navigation.NavigateTo($"/thread/{Post.Id}");
+        Navigation.NavigateTo(GetThreadUri());
     }
 
     private async Task OnShareClick()
     {
         _isToastVisible = true;
         
-        var url = Navigation.ToAbsoluteUri($"/thread/{Post.Id}").ToString();
+        if(Post.ParentId is null){}
+        var url = Navigation.ToAbsoluteUri(GetThreadUri()).ToString();
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
 
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         _isToastVisible = false;
     }
+
+    private void OnProfileClick()
+    {
+        Navigation.NavigateTo($"/profile/{Post.Profile.UserId}");
+    }
+    
+    private string GetThreadUri()
+    {
+        var id = Post.ParentId ?? Post.Id;
+        return $"/thread/{id}";
+    }
+    
 
 }

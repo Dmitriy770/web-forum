@@ -1,5 +1,6 @@
 ﻿@using WebForum.Frontend.HttpClients
 @inject PostHttpClient PostHttpClient
+@inject NavigationManager Navigation
 
 <button class="@Class btn btn-primary"
         onclick="create_modal.showModal()">
@@ -27,12 +28,12 @@
                 <button class="btn btn-primary" @onclick="OnCreateClick">Create</button>
             </form>
             <form method="dialog">
-                <button class="btn btn-error">Close</button>
+                <button class="btn btn-error" @onclick="OnCloseCLick">Close</button>
             </form>
         </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-        <button>close</button>
+        <button @onclick="OnCloseCLick">close</button>
     </form>
 </dialog>
 
@@ -42,9 +43,20 @@
 
     private string _payload = string.Empty;
 
+    private void OnCloseCLick()
+    {
+        _payload = string.Empty;
+    }
+    
     private async Task OnCreateClick()
     {
         await PostHttpClient.Create(_payload, ParentId, default);
+        _payload = string.Empty;
+        
+        var oldUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo("/");
+        await Task.Delay(TimeSpan.FromMilliseconds(10));
+        Navigation.NavigateTo(oldUri);
     }
 
 }
