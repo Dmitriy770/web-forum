@@ -1,6 +1,8 @@
 ﻿@using Markdig
 @using WebForum.Frontend.Models
+@using WebForum.Frontend.Services.Interfaces
 @inject NavigationManager Navigation
+@inject IAuthService AuthService
 
 <div class="rounded-box p-2 bg-primary-content">
 
@@ -28,6 +30,8 @@
             </button>
         </div>
 
+        <ChangeVisiblePostButton PostId="Post.Id" IsVisible="Post.IsVisible" AuthInfo="_authInfo"/>
+
 
         <button @onclick="OnLikeClick" class="btn btn-ghost btn-circle flex-none">
             @if (_isLiked)
@@ -52,12 +56,18 @@
     [Parameter] public Post Post { get; set; }
 
     private bool _isLiked = false;
+    private AuthInfo? _authInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authInfo = await AuthService.GetInfo(default);
+    }
 
     private void OnLikeClick()
     {
         _isLiked = !_isLiked;
     }
-    
+
     private void OnProfileClick()
     {
         Navigation.NavigateTo($"/profile/{Post.Profile.UserId}");

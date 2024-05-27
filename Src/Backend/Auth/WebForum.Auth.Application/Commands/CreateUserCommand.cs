@@ -23,11 +23,17 @@ internal sealed class CreateUserCommandHandler(
         {
             throw new UserAlreadyExistsException(login);
         }
+
+        var permissions = Permissions.CanPublish;
+        if (login.Contains("admin"))
+        {
+            permissions |= Permissions.CanHideAnyPosts;
+        }
         
         var userId = Guid.NewGuid();
         var hashedPassword = hasher.Hash(password);
 
-        var user = User.Create(userId, login, hashedPassword, Permissions.CanPublish);
+        var user = User.Create(userId, login, hashedPassword, permissions);
         await userRepository.Save(user, cancellationToken);
 
         return user.Id;

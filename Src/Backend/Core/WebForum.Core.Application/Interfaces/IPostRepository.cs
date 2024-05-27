@@ -5,6 +5,8 @@ namespace WebForum.Core.Application.Interfaces;
 public interface IPostRepository
 {
     public Task Save(Post post, CancellationToken cancellationToken);
+
+    public Task Update(Post post, CancellationToken cancellationToken);
     
     public Task<Post?> FindById(Guid id, CancellationToken cancellationToken);
     

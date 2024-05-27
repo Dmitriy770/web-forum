@@ -1,6 +1,8 @@
 ﻿@using WebForum.Frontend.Models
+@using WebForum.Frontend.Services.Interfaces
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navigation
+@inject IAuthService AuthService
 
 <div class="rounded-box p-2 bg-primary-content">
 
@@ -27,7 +29,8 @@
                 </div>
             </button>
         </div>
-
+        
+        <ChangeVisiblePostButton PostId="Post.Id" IsVisible="Post.IsVisible" AuthInfo="_authInfo"/>
 
         <button @onclick="OnShareClick" class="flex-none btn btn-ghost btn-circle">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -60,6 +63,16 @@
 
     private bool _isToastVisible = false;
 
+    private AuthInfo? _authInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authInfo = await AuthService.GetInfo(default);
+        Console.WriteLine("=>");
+        Console.WriteLine(_authInfo);
+        Console.WriteLine("<=");
+    }
+
     private void OnMoreClick()
     {
         Navigation.NavigateTo(GetThreadUri());
@@ -68,8 +81,7 @@
     private async Task OnShareClick()
     {
         _isToastVisible = true;
-        
-        if(Post.ParentId is null){}
+
         var url = Navigation.ToAbsoluteUri(GetThreadUri()).ToString();
         await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", url);
 
@@ -81,12 +93,12 @@
     {
         Navigation.NavigateTo($"/profile/{Post.Profile.UserId}");
     }
-    
+
     private string GetThreadUri()
     {
         var id = Post.ParentId ?? Post.Id;
         return $"/thread/{id}";
     }
-    
+
 
 }

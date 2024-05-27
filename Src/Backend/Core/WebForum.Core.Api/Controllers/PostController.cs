@@ -34,6 +34,13 @@ public class PostController
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+        group.MapPatch("/{id:guid}", UpdateIsVisible)
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
     }
 
     private async Task<IResult> GetPostById(
@@ -102,6 +109,25 @@ public class PostController
         {
             var userId = (context.Items["UserId"] as Guid?)!.Value;
             await sender.Send(new CreatePostCommand(request.Content, request.ParentId, userId), cancellationToken);
+            return Results.Ok();
+        }
+        catch (Exception exception)
+        {
+            return HandleException(exception);
+        }
+    }
+    
+    [Authorization(Permissions.CanHideAnyPosts)]
+    private async Task<IResult> UpdateIsVisible(
+        Guid id,
+        [FromQuery] bool isVisible,
+        CancellationToken cancellationToken,
+        ISender sender)
+    {
+        try
+        {
+            Console.WriteLine("Here1");
+            await sender.Send(new ChangeVisibleCommand(id, isVisible), cancellationToken);
             return Results.Ok();
         }
         catch (Exception exception)

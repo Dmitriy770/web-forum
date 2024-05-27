@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices.JavaScript;
 using WebForum.Frontend.HttpClients.Requests;
 using WebForum.Frontend.HttpClients.Responses;
 using WebForum.Frontend.Models;
@@ -64,6 +65,17 @@ public class PostHttpClient(
         return response.StatusCode switch {
             HttpStatusCode.OK => (PreparePosts(await response.Content.ReadFromJsonAsync<GetAllPostsResponse>(cancellationToken)), null),
             _ => (new List<Post>(), await response.Content.ReadFromJsonAsync<Error>(cancellationToken))
+        };
+    }
+
+    public async Task<Error?> ChangeVisible(Guid id, bool isVisible, CancellationToken cancellationToken)
+    {
+        var response = await httpClient.PatchAsync($"api/post/{id}?isVisible={isVisible}", null, cancellationToken);
+
+        return response.StatusCode switch
+        {
+            HttpStatusCode.OK => null,
+            _ => await response.Content.ReadFromJsonAsync<Error>(cancellationToken)
         };
     }
 

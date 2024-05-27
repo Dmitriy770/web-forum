@@ -5,11 +5,19 @@ namespace WebForum.Core.Infrastructure.Repositories;
 
 public sealed class FakePostRepository : IPostRepository
 {
-    private static readonly List<Post> Posts = [];
+    private static List<Post> Posts = [];
 
     public Task Save(Post post, CancellationToken cancellationToken)
     {
         Posts.Add(post);
+        return Task.CompletedTask;
+    }
+
+    public Task Update(Post post, CancellationToken cancellationToken)
+    {
+        Posts = Posts.Where(p => p.Id != post.Id).ToList();
+        Posts.Add(post);
+        
         return Task.CompletedTask;
     }
 
@@ -31,6 +39,10 @@ public sealed class FakePostRepository : IPostRepository
 
     public IAsyncEnumerable<Post> GetAll(int take, int skip, CancellationToken cancellationToken)
     {
-        return Posts.Where(post => post.ParentId is null).Skip(skip).Take(take).ToAsyncEnumerable();
+        return Posts.Where(post => post.ParentId is null)
+            .Skip(skip)
+            .Take(take)
+            .OrderByDescending(post => post.CreationDate)
+            .ToAsyncEnumerable();
     }
 }
