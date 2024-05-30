@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using WebForum.Application.Services.Interfaces;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
 
 namespace WebForum.Application.Queries;
 
@@ -12,6 +13,6 @@ internal sealed class GetAllSpacesHandler(
 {
     public IAsyncEnumerable<Space> Handle(GetAllSpaces request, CancellationToken cancellationToken)
     {
-        return spaceService.GetAllSpaces(cancellationToken);
+        return spaceService.GetAll(cancellationToken);
     }
 }

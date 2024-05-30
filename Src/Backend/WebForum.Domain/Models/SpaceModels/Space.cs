@@ -1,4 +1,6 @@
-﻿namespace WebForum.Domain.Models;
+﻿using WebForum.Domain.Models.UserModels;
+
+namespace WebForum.Domain.Models.SpaceModels;
 
 public record Space
 {

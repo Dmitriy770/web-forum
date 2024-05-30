@@ -2,6 +2,8 @@
 using WebForum.Application.Extensions;
 using WebForum.Application.Interfaces;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
+using WebForum.Domain.Models.UserModels;
 
 namespace WebForum.Application.Commands;
 

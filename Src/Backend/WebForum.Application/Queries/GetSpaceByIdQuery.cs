@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using WebForum.Application.Services.Interfaces;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
 
 namespace WebForum.Application.Queries;
 
@@ -16,7 +17,7 @@ internal sealed class GetSpaceByIdQueryHandler(
     {
         var id = request.Id;
 
-        var space = await spaceService.GetSpace(id, cancellationToken);
+        var space = await spaceService.GetById(id, cancellationToken);
 
         return space;
     }

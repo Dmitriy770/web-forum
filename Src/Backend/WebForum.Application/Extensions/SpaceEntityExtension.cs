@@ -1,5 +1,6 @@
 ﻿using WebForum.Application.Entities;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
 
 namespace WebForum.Application.Extensions;
 

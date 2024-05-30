@@ -3,6 +3,7 @@ using WebForum.Application.Entities;
 using WebForum.Application.Interfaces;
 using WebForum.Application.Services.Interfaces;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
 
 namespace WebForum.Application.Services;
 
@@ -11,14 +12,14 @@ public class SpaceService(
     IUserRepository userRepository
 ) : ISpaceService
 {
-    public async Task<Space> GetSpace(Guid id, CancellationToken cancellationToken)
+    public async Task<Space> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var spaceEntity = await spaceRepository.FindById(id, cancellationToken);
+        var spaceEntity = await spaceRepository.GetById(id, cancellationToken);
 
         return await PrepareSpace(spaceEntity, cancellationToken);
     }
 
-    public async IAsyncEnumerable<Space> GetAllSpaces([EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<Space> GetAll([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var spaceEntity in spaceRepository.GetAll(cancellationToken))
         {

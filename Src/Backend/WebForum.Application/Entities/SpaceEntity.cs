@@ -1,4 +1,5 @@
 ﻿using WebForum.Domain.Models;
+using WebForum.Domain.Models.SpaceModels;
 
 namespace WebForum.Application.Entities;
 

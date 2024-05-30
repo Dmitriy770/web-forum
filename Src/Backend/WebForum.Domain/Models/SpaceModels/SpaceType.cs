@@ -1,4 +1,4 @@
-﻿namespace WebForum.Domain.Models;
+﻿namespace WebForum.Domain.Models.SpaceModels;
 
 public enum SpaceType
 {

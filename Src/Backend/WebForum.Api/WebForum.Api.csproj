@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WebForum.Domain\WebForum.Domain.csproj" />
+      <ProjectReference Include="..\WebForum.Application\WebForum.Application.csproj" />
     </ItemGroup>
 
 </Project>

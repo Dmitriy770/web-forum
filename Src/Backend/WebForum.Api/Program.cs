@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using WebForum.Domain.Models;
+using WebForum.Domain.Models.AuthModels;
+using WebForum.Domain.Models.SpaceModels;
+using WebForum.Domain.Models.UserModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +14,12 @@ builder.Services.AddSwaggerGen();
 
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Space>("Spaces");
+modelBuilder.EntitySet<User>("User");
+modelBuilder.EntitySet<Auth>("Auth");
 
 builder.Services.AddControllers().AddOData(
     options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
-        "odata",
+        "api/odata",
         modelBuilder.GetEdmModel())
 );
 

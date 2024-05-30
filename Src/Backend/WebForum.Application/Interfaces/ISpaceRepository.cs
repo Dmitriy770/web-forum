@@ -9,7 +9,7 @@ public interface ISpaceRepository
     
     public Task Update(SpaceEntity space, CancellationToken cancellationToken);
 
-    public Task<SpaceEntity> FindById(Guid id, CancellationToken cancellationToken);
+    public Task<SpaceEntity> GetById(Guid id, CancellationToken cancellationToken);
     
     public IAsyncEnumerable<SpaceEntity> GetAll(CancellationToken cancellationToken);
 }
