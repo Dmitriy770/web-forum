@@ -25,3 +25,7 @@ public class AuthorizationFilter(
         }
     }
 }
+
+// TODO доабвить конфиг для jwt вмесе с именем cookie
+// TODO создать слой infrastructure
+// TODO зарегать все сервисы
